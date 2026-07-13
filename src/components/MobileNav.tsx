@@ -43,13 +43,22 @@ export default function MobileNav({
               日程一覧
             </Link>
             {isAdmin && (
-              <Link
-                href="/admin/events/new"
-                className="py-3 border-b text-slate-600"
-                onClick={() => setOpen(false)}
-              >
-                日程作成
-              </Link>
+              <>
+                <Link
+                  href="/admin/events/new"
+                  className="py-3 border-b text-slate-600"
+                  onClick={() => setOpen(false)}
+                >
+                  日程作成
+                </Link>
+                <Link
+                  href="/admin/members"
+                  className="py-3 border-b text-slate-600"
+                  onClick={() => setOpen(false)}
+                >
+                  メンバー管理
+                </Link>
+              </>
             )}
             <span className="py-3 border-b text-slate-400">{userLabel}</span>
             <form action={signOutAction}>

@@ -2,7 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getCurrentProfile } from "@/lib/session";
 
 function parseEventForm(formData: FormData) {
   return {
@@ -19,16 +20,14 @@ function parseEventForm(formData: FormData) {
 }
 
 export async function createEvent(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const profile = await getCurrentProfile();
+  if (profile?.role !== "admin") redirect("/events");
 
+  const supabase = createAdminClient();
   const values = parseEventForm(formData);
   const { data, error } = await supabase
     .from("events")
-    .insert({ ...values, created_by: user.id })
+    .insert({ ...values, created_by: profile.id })
     .select("id")
     .single();
 
@@ -41,7 +40,10 @@ export async function createEvent(formData: FormData) {
 }
 
 export async function updateEvent(eventId: string, formData: FormData) {
-  const supabase = await createClient();
+  const profile = await getCurrentProfile();
+  if (profile?.role !== "admin") redirect("/events");
+
+  const supabase = createAdminClient();
   const values = parseEventForm(formData);
 
   const { error } = await supabase.from("events").update(values).eq("id", eventId);

@@ -1,4 +1,6 @@
+import { redirect } from "next/navigation";
 import EventForm from "@/components/EventForm";
+import { getCurrentProfile } from "@/lib/session";
 import { createEvent } from "../actions";
 
 export default async function NewEventPage({
@@ -6,6 +8,9 @@ export default async function NewEventPage({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
+  const profile = await getCurrentProfile();
+  if (profile?.role !== "admin") redirect("/events");
+
   const { error } = await searchParams;
 
   return (

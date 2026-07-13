@@ -1,12 +1,14 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getCurrentProfile } from "@/lib/session";
 import type { Event, Rsvp } from "@/types/database";
 
 export default async function EventsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const profile = await getCurrentProfile();
+  if (!profile) redirect("/login");
+
+  const supabase = createAdminClient();
 
   const { data: events } = await supabase
     .from("events")
@@ -26,7 +28,7 @@ export default async function EventsPage() {
       .length;
 
   const myStatusFor = (eventId: string) =>
-    (rsvps ?? []).find((r) => r.event_id === eventId && r.user_id === user?.id)
+    (rsvps ?? []).find((r) => r.event_id === eventId && r.user_id === profile?.id)
       ?.status;
 
   return (

@@ -1,24 +1,14 @@
-import { createClient } from "@/lib/supabase/server";
-import { signOut } from "@/app/login/actions";
 import Link from "next/link";
+import { getCurrentProfile } from "@/lib/session";
+import { signOut } from "@/app/login/actions";
 import MobileNav from "./MobileNav";
 
 export default async function Header() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const profile = await getCurrentProfile();
+  if (!profile) return null;
 
-  if (!user) return null;
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("name, role")
-    .eq("id", user.id)
-    .single();
-
-  const isAdmin = profile?.role === "admin";
-  const userLabel = `${profile?.name ?? ""}${isAdmin ? "（幹事）" : ""}`;
+  const isAdmin = profile.role === "admin";
+  const userLabel = `${profile.name}${isAdmin ? "（幹事）" : ""}`;
 
   return (
     <header className="border-b bg-white relative">
@@ -32,12 +22,20 @@ export default async function Header() {
             日程一覧
           </Link>
           {isAdmin && (
-            <Link
-              href="/admin/events/new"
-              className="text-slate-600 hover:text-emerald-700"
-            >
-              日程作成
-            </Link>
+            <>
+              <Link
+                href="/admin/events/new"
+                className="text-slate-600 hover:text-emerald-700"
+              >
+                日程作成
+              </Link>
+              <Link
+                href="/admin/members"
+                className="text-slate-600 hover:text-emerald-700"
+              >
+                メンバー管理
+              </Link>
+            </>
           )}
           <span className="text-slate-400">{userLabel}</span>
           <form action={signOut}>

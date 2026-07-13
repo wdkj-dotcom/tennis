@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import type { Event, Profile, Rsvp } from "@/types/database";
+import { notFound, redirect } from "next/navigation";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getCurrentProfile } from "@/lib/session";
+import type { Event, Rsvp } from "@/types/database";
 import { setRsvp, deleteEvent } from "./actions";
 
 export default async function EventDetailPage({
@@ -9,12 +10,11 @@ export default async function EventDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  const supabase = await createClient();
+  const myProfile = await getCurrentProfile();
+  if (!myProfile) redirect("/login");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { id } = await params;
+  const supabase = createAdminClient();
 
   const { data: event } = await supabase
     .from("events")
@@ -24,12 +24,6 @@ export default async function EventDetailPage({
 
   if (!event) notFound();
 
-  const { data: myProfile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user!.id)
-    .single<Profile>();
-
   const { data: rsvps } = await supabase
     .from("rsvps")
     .select("*, profiles(name)")
@@ -38,7 +32,7 @@ export default async function EventDetailPage({
 
   const attending = (rsvps ?? []).filter((r) => r.status === "attending");
   const notAttending = (rsvps ?? []).filter((r) => r.status === "not_attending");
-  const myStatus = (rsvps ?? []).find((r) => r.user_id === user?.id)?.status;
+  const myStatus = (rsvps ?? []).find((r) => r.user_id === myProfile?.id)?.status;
 
   const isAdmin = myProfile?.role === "admin";
 

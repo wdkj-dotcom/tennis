@@ -1,6 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import EventForm from "@/components/EventForm";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getCurrentProfile } from "@/lib/session";
 import type { Event } from "@/types/database";
 import { updateEvent } from "../../actions";
 
@@ -11,9 +12,12 @@ export default async function EditEventPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ error?: string }>;
 }) {
+  const profile = await getCurrentProfile();
+  if (profile?.role !== "admin") redirect("/events");
+
   const { id } = await params;
   const { error } = await searchParams;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data: event } = await supabase
     .from("events")

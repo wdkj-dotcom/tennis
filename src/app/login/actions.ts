@@ -1,46 +1,79 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { SESSION_COOKIE } from "@/lib/session-cookie";
 
-export async function signIn(formData: FormData) {
-  const supabase = await createClient();
-  const email = String(formData.get("email"));
-  const password = String(formData.get("password"));
+export async function nameLogin(formData: FormData) {
+  const name = String(formData.get("name") ?? "").trim();
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) {
-    redirect(`/login?error=${encodeURIComponent(error.message)}`);
+  if (!name) {
+    redirect(`/login?error=${encodeURIComponent("名前を入力してください")}`);
   }
 
-  revalidatePath("/", "layout");
-  redirect("/events");
-}
+  const supabase = createAdminClient();
 
-export async function signUp(formData: FormData) {
-  const supabase = await createClient();
-  const email = String(formData.get("email"));
-  const password = String(formData.get("password"));
-  const name = String(formData.get("name"));
-  const role = String(formData.get("role")) === "admin" ? "admin" : "member";
+  const { data: existingRows } = await supabase
+    .from("profiles")
+    .select("id")
+    .ilike("name", name)
+    .order("created_at", { ascending: true })
+    .limit(1);
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: { data: { name, role } },
+  let profileId: string;
+
+  if (existingRows && existingRows.length > 0) {
+    profileId = existingRows[0].id;
+  } else {
+    const { count } = await supabase
+      .from("profiles")
+      .select("*", { count: "exact", head: true });
+
+    const role = (count ?? 0) === 0 ? "admin" : "member";
+
+    const { data: created, error } = await supabase
+      .from("profiles")
+      .insert({ name, role })
+      .select("id")
+      .single();
+
+    if (error?.code === "23505") {
+      // 同時に同名で登録された場合は既存の行にフォールバックする
+      const { data: fallback } = await supabase
+        .from("profiles")
+        .select("id")
+        .ilike("name", name)
+        .order("created_at", { ascending: true })
+        .limit(1);
+      if (!fallback || fallback.length === 0) {
+        redirect(`/login?error=${encodeURIComponent("登録に失敗しました")}`);
+      }
+      profileId = fallback![0].id;
+    } else if (error || !created) {
+      redirect(`/login?error=${encodeURIComponent("登録に失敗しました")}`);
+    } else {
+      profileId = created.id;
+    }
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set(SESSION_COOKIE, profileId, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 365,
+    path: "/",
   });
-  if (error) {
-    redirect(`/login?error=${encodeURIComponent(error.message)}`);
-  }
 
   revalidatePath("/", "layout");
   redirect("/events");
 }
 
 export async function signOut() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
+  const cookieStore = await cookies();
+  cookieStore.delete(SESSION_COOKIE);
   revalidatePath("/", "layout");
   redirect("/login");
 }
