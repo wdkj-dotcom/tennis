@@ -30,3 +30,18 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+a,
+button {
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+a:active,
+button:active:not(:disabled) {
+  opacity: 0.6;
+  transform: scale(0.97);
+}
+
+button:disabled {
+  cursor: default;
+}

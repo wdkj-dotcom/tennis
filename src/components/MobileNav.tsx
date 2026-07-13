@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import SubmitButton from "@/components/SubmitButton";
 
 export default function MobileNav({
   isAdmin,
@@ -62,9 +63,12 @@ export default function MobileNav({
             )}
             <span className="py-3 border-b text-slate-400">{userLabel}</span>
             <form action={signOutAction}>
-              <button className="py-3 text-red-600 w-full text-left">
+              <SubmitButton
+                pendingText="ログアウト中…"
+                className="py-3 text-red-600 w-full text-left"
+              >
                 ログアウト
-              </button>
+              </SubmitButton>
             </form>
           </nav>
         </div>

@@ -1,3 +1,4 @@
+import SubmitButton from "@/components/SubmitButton";
 import type { Event } from "@/types/database";
 
 export default function EventForm({
@@ -84,12 +85,12 @@ export default function EventForm({
           placeholder="持ち物や注意事項など"
         />
       </div>
-      <button
-        type="submit"
+      <SubmitButton
+        pendingText="保存しています…"
         className="bg-emerald-600 text-white rounded px-4 py-2 text-sm font-medium hover:bg-emerald-700"
       >
         {submitLabel}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

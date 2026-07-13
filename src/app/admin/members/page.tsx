@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/session";
 import MemberActions from "@/components/MemberActions";
+import SubmitButton from "@/components/SubmitButton";
 import type { Profile } from "@/types/database";
 import { addMember, setMemberRole, renameMember, deleteMember } from "./actions";
 
@@ -56,12 +57,12 @@ export default async function MembersPage({
               <option value="admin">幹事</option>
             </select>
           </div>
-          <button
-            type="submit"
+          <SubmitButton
+            pendingText="追加しています…"
             className="bg-emerald-600 text-white rounded px-4 py-2 text-sm font-medium hover:bg-emerald-700"
           >
             追加する
-          </button>
+          </SubmitButton>
         </form>
       </div>
 

@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/session";
+import SubmitButton from "@/components/SubmitButton";
 import { nameLogin } from "./actions";
 
 export default async function LoginPage({
@@ -37,12 +38,12 @@ export default async function LoginPage({
               placeholder="山田 太郎"
             />
           </div>
-          <button
-            type="submit"
+          <SubmitButton
+            pendingText="入っています…"
             className="w-full bg-emerald-600 text-white rounded py-2 text-sm font-medium hover:bg-emerald-700"
           >
             入る
-          </button>
+          </SubmitButton>
         </form>
 
         <p className="text-center text-xs text-slate-400 mt-4">

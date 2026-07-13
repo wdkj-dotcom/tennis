@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getCurrentProfile } from "@/lib/session";
 import { signOut } from "@/app/login/actions";
+import SubmitButton from "@/components/SubmitButton";
 import MobileNav from "./MobileNav";
 
 export default async function Header() {
@@ -39,9 +40,9 @@ export default async function Header() {
           )}
           <span className="text-slate-400">{userLabel}</span>
           <form action={signOut}>
-            <button className="text-slate-500 hover:text-red-600">
+            <SubmitButton pendingText="ログアウト中…" className="text-slate-500 hover:text-red-600">
               ログアウト
-            </button>
+            </SubmitButton>
           </form>
         </nav>
 

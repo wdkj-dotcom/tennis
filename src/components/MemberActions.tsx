@@ -52,7 +52,7 @@ export default function MemberActions({
       <button
         onClick={handleRename}
         disabled={isPending}
-        className="text-slate-500 hover:text-emerald-700 disabled:opacity-50"
+        className="text-slate-500 hover:text-emerald-700 disabled:opacity-50 disabled:cursor-wait"
       >
         名前を変更
       </button>
@@ -61,16 +61,16 @@ export default function MemberActions({
           <button
             onClick={handleToggleRole}
             disabled={isPending}
-            className="text-slate-500 hover:text-emerald-700 disabled:opacity-50"
+            className="text-slate-500 hover:text-emerald-700 disabled:opacity-50 disabled:cursor-wait"
           >
-            {role === "admin" ? "参加者にする" : "幹事にする"}
+            {isPending ? "処理中…" : role === "admin" ? "参加者にする" : "幹事にする"}
           </button>
           <button
             onClick={handleDelete}
             disabled={isPending}
-            className="text-red-500 hover:text-red-700 disabled:opacity-50"
+            className="text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-wait"
           >
-            削除
+            {isPending ? "処理中…" : "削除"}
           </button>
         </>
       )}

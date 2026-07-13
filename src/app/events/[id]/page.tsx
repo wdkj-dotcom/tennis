@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/session";
 import { formatEventTitle } from "@/lib/eventFormat";
+import SubmitButton from "@/components/SubmitButton";
 import type { Event, Rsvp } from "@/types/database";
 import { setRsvp, deleteEvent } from "./actions";
 
@@ -64,7 +65,12 @@ export default async function EventDetailPage({
                 編集
               </Link>
               <form action={removeEvent}>
-                <button className="text-red-500 hover:text-red-700">削除</button>
+                <SubmitButton
+                  pendingText="削除中…"
+                  className="text-red-500 hover:text-red-700"
+                >
+                  削除
+                </SubmitButton>
               </form>
             </div>
           )}
@@ -91,7 +97,8 @@ export default async function EventDetailPage({
 
         <div className="mt-6 flex gap-3">
           <form action={setRsvpAttending}>
-            <button
+            <SubmitButton
+              pendingText="送信中…"
               className={`px-4 py-2 rounded text-sm font-medium ${
                 myStatus === "attending"
                   ? "bg-emerald-600 text-white"
@@ -99,10 +106,11 @@ export default async function EventDetailPage({
               }`}
             >
               参加する
-            </button>
+            </SubmitButton>
           </form>
           <form action={setRsvpNotAttending}>
-            <button
+            <SubmitButton
+              pendingText="送信中…"
               className={`px-4 py-2 rounded text-sm font-medium ${
                 myStatus === "not_attending"
                   ? "bg-slate-600 text-white"
@@ -110,7 +118,7 @@ export default async function EventDetailPage({
               }`}
             >
               不参加
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </div>
