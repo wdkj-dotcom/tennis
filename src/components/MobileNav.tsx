@@ -1,0 +1,65 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+
+export default function MobileNav({
+  isAdmin,
+  userLabel,
+  signOutAction,
+}: {
+  isAdmin: boolean;
+  userLabel: string;
+  signOutAction: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="sm:hidden">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-label="メニュー"
+        className="p-2 -mr-2 text-slate-600"
+      >
+        {open ? (
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+          </svg>
+        ) : (
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
+          </svg>
+        )}
+      </button>
+
+      {open && (
+        <div className="absolute left-0 right-0 top-full bg-white border-b shadow-sm">
+          <nav className="flex flex-col px-4 py-2 text-sm">
+            <Link
+              href="/events"
+              className="py-3 border-b text-slate-600"
+              onClick={() => setOpen(false)}
+            >
+              日程一覧
+            </Link>
+            {isAdmin && (
+              <Link
+                href="/admin/events/new"
+                className="py-3 border-b text-slate-600"
+                onClick={() => setOpen(false)}
+              >
+                日程作成
+              </Link>
+            )}
+            <span className="py-3 border-b text-slate-400">{userLabel}</span>
+            <form action={signOutAction}>
+              <button className="py-3 text-red-600 w-full text-left">
+                ログアウト
+              </button>
+            </form>
+          </nav>
+        </div>
+      )}
+    </div>
+  );
+}
