@@ -16,16 +16,6 @@ export default function EventForm({
       {error && (
         <p className="text-sm text-red-600 bg-red-50 rounded px-3 py-2">{error}</p>
       )}
-      <div>
-        <label className="block text-sm mb-1">タイトル</label>
-        <input
-          name="title"
-          required
-          defaultValue={defaultValues?.title}
-          className="w-full border rounded px-3 py-2 text-sm"
-          placeholder="例: 週末練習会"
-        />
-      </div>
       <div className="grid grid-cols-3 gap-3">
         <div>
           <label className="block text-sm mb-1">日付</label>
@@ -55,6 +45,15 @@ export default function EventForm({
             className="w-full border rounded px-3 py-2 text-sm"
           />
         </div>
+      </div>
+      <div>
+        <label className="block text-sm mb-1">サブタイトル（任意）</label>
+        <input
+          name="subtitle"
+          defaultValue={defaultValues?.subtitle ?? ""}
+          className="w-full border rounded px-3 py-2 text-sm"
+          placeholder="例: 初心者歓迎"
+        />
       </div>
       <div>
         <label className="block text-sm mb-1">場所</label>

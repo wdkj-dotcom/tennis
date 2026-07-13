@@ -10,7 +10,7 @@ export interface Profile {
 
 export interface Event {
   id: string;
-  title: string;
+  subtitle: string | null;
   event_date: string;
   start_time: string | null;
   end_time: string | null;

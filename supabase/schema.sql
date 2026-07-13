@@ -11,7 +11,7 @@ create table if not exists profiles (
 
 create table if not exists events (
   id uuid primary key default gen_random_uuid(),
-  title text not null,
+  subtitle text,
   event_date date not null,
   start_time time,
   end_time time,

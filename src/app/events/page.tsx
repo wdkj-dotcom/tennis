@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/session";
+import { formatEventTitle } from "@/lib/eventFormat";
 import type { Event, Rsvp } from "@/types/database";
 
 export default async function EventsPage() {
@@ -18,14 +19,13 @@ export default async function EventsPage() {
 
   const { data: rsvps } = await supabase
     .from("rsvps")
-    .select("*")
-    .returns<Rsvp[]>();
+    .select("*, profiles(name)")
+    .returns<(Rsvp & { profiles: { name: string } | null })[]>();
 
   const today = new Date().toISOString().slice(0, 10);
 
-  const countFor = (eventId: string) =>
-    (rsvps ?? []).filter((r) => r.event_id === eventId && r.status === "attending")
-      .length;
+  const attendingFor = (eventId: string) =>
+    (rsvps ?? []).filter((r) => r.event_id === eventId && r.status === "attending");
 
   const myStatusFor = (eventId: string) =>
     (rsvps ?? []).find((r) => r.event_id === eventId && r.user_id === profile?.id)
@@ -40,6 +40,7 @@ export default async function EventsPage() {
       ) : (
         <ul className="space-y-3">
           {events.map((ev) => {
+            const attending = attendingFor(ev.id);
             const status = myStatusFor(ev.id);
             const isPast = ev.event_date < today;
             return (
@@ -50,26 +51,36 @@ export default async function EventsPage() {
                     isPast ? "opacity-50" : ""
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-2 flex-wrap">
-                    <span className="font-medium break-words">{ev.title}</span>
-                    <span className="text-sm text-slate-500 whitespace-nowrap">
-                      {ev.event_date}
-                      {ev.start_time ? ` ${ev.start_time.slice(0, 5)}` : ""}
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span className="font-medium break-words">
+                      {formatEventTitle(ev)}
                     </span>
-                  </div>
-                  <div className="flex items-center justify-between gap-2 flex-wrap mt-2 text-sm text-slate-500">
-                    <span className="break-words">{ev.location ?? "場所未定"}</span>
-                    <span className="flex items-center gap-2 whitespace-nowrap">
-                      参加 {countFor(ev.id)}
+                    {ev.subtitle && (
+                      <span className="text-sm text-slate-500 break-words">
+                        {ev.subtitle}
+                      </span>
+                    )}
+                    <span className="text-sm text-slate-500 break-words">
+                      {ev.location ?? "場所未定"}
+                    </span>
+                    <span className="text-sm text-slate-500 break-words">
+                      参加 {attending.length}
                       {ev.capacity ? ` / ${ev.capacity}` : ""}人
                       {status === "attending" && (
-                        <span className="text-emerald-600 font-medium">参加予定</span>
+                        <span className="ml-2 text-emerald-600 font-medium">
+                          参加予定
+                        </span>
                       )}
                       {status === "not_attending" && (
-                        <span className="text-slate-400">不参加</span>
+                        <span className="ml-2 text-slate-400">不参加</span>
                       )}
                     </span>
                   </div>
+                  {attending.length > 0 && (
+                    <p className="mt-1 text-sm text-slate-500 break-words">
+                      {attending.map((r) => r.profiles?.name ?? "不明").join("、")}
+                    </p>
+                  )}
                 </Link>
               </li>
             );

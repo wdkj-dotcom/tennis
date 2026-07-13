@@ -7,7 +7,7 @@ import { getCurrentProfile } from "@/lib/session";
 
 function parseEventForm(formData: FormData) {
   return {
-    title: String(formData.get("title")),
+    subtitle: (formData.get("subtitle") as string) || null,
     event_date: String(formData.get("event_date")),
     start_time: (formData.get("start_time") as string) || null,
     end_time: (formData.get("end_time") as string) || null,

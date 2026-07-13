@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/session";
+import { formatEventTitle } from "@/lib/eventFormat";
 import type { Event, Rsvp } from "@/types/database";
 import { setRsvp, deleteEvent } from "./actions";
 
@@ -47,8 +48,13 @@ export default async function EventDetailPage({
       </Link>
 
       <div className="bg-white rounded-lg shadow-sm border p-6 mt-4">
-        <div className="flex items-start justify-between">
-          <h1 className="text-xl font-bold">{event.title}</h1>
+        <div className="flex items-start justify-between gap-2 flex-wrap">
+          <div>
+            <h1 className="text-xl font-bold break-words">{formatEventTitle(event)}</h1>
+            {event.subtitle && (
+              <p className="text-sm text-slate-500 break-words">{event.subtitle}</p>
+            )}
+          </div>
           {isAdmin && (
             <div className="flex gap-3 text-sm">
               <Link
@@ -66,16 +72,8 @@ export default async function EventDetailPage({
 
         <dl className="mt-4 space-y-1 text-sm text-slate-600">
           <div className="flex gap-2">
-            <dt className="w-16 text-slate-400">日付</dt>
-            <dd>
-              {event.event_date}
-              {event.start_time ? ` ${event.start_time.slice(0, 5)}` : ""}
-              {event.end_time ? `〜${event.end_time.slice(0, 5)}` : ""}
-            </dd>
-          </div>
-          <div className="flex gap-2">
             <dt className="w-16 text-slate-400">場所</dt>
-            <dd>{event.location ?? "未定"}</dd>
+            <dd className="break-words">{event.location ?? "未定"}</dd>
           </div>
           {event.capacity && (
             <div className="flex gap-2">
@@ -117,24 +115,28 @@ export default async function EventDetailPage({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mt-6">
-        <div className="bg-white rounded-lg shadow-sm border p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+        <div className="bg-white rounded-lg shadow-sm border p-4 min-w-0">
           <h2 className="font-medium text-sm mb-2 text-emerald-700">
             参加 ({attending.length})
           </h2>
           <ul className="space-y-1 text-sm text-slate-600">
             {attending.map((r) => (
-              <li key={r.user_id}>{r.profiles?.name ?? "不明"}</li>
+              <li key={r.user_id} className="break-words">
+                {r.profiles?.name ?? "不明"}
+              </li>
             ))}
           </ul>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border p-4">
+        <div className="bg-white rounded-lg shadow-sm border p-4 min-w-0">
           <h2 className="font-medium text-sm mb-2 text-slate-500">
             不参加 ({notAttending.length})
           </h2>
           <ul className="space-y-1 text-sm text-slate-600">
             {notAttending.map((r) => (
-              <li key={r.user_id}>{r.profiles?.name ?? "不明"}</li>
+              <li key={r.user_id} className="break-words">
+                {r.profiles?.name ?? "不明"}
+              </li>
             ))}
           </ul>
         </div>
