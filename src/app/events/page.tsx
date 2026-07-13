@@ -50,16 +50,16 @@ export default async function EventsPage() {
                     isPast ? "opacity-50" : ""
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{ev.title}</span>
-                    <span className="text-sm text-slate-500">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <span className="font-medium break-words">{ev.title}</span>
+                    <span className="text-sm text-slate-500 whitespace-nowrap">
                       {ev.event_date}
                       {ev.start_time ? ` ${ev.start_time.slice(0, 5)}` : ""}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between mt-2 text-sm text-slate-500">
-                    <span>{ev.location ?? "場所未定"}</span>
-                    <span className="flex items-center gap-2">
+                  <div className="flex items-center justify-between gap-2 flex-wrap mt-2 text-sm text-slate-500">
+                    <span className="break-words">{ev.location ?? "場所未定"}</span>
+                    <span className="flex items-center gap-2 whitespace-nowrap">
                       参加 {countFor(ev.id)}
                       {ev.capacity ? ` / ${ev.capacity}` : ""}人
                       {status === "attending" && (
