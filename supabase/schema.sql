@@ -25,7 +25,7 @@ create table if not exists events (
 create table if not exists rsvps (
   event_id uuid not null references events(id) on delete cascade,
   user_id uuid not null references profiles(id) on delete cascade,
-  status text not null check (status in ('attending', 'not_attending')),
+  status text not null check (status in ('attending', 'not_attending', 'pending')),
   updated_at timestamptz not null default now(),
   primary key (event_id, user_id)
 );

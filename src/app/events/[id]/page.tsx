@@ -33,12 +33,14 @@ export default async function EventDetailPage({
     .returns<(Rsvp & { profiles: { name: string } | null })[]>();
 
   const attending = (rsvps ?? []).filter((r) => r.status === "attending");
+  const pending = (rsvps ?? []).filter((r) => r.status === "pending");
   const notAttending = (rsvps ?? []).filter((r) => r.status === "not_attending");
   const myStatus = (rsvps ?? []).find((r) => r.user_id === myProfile?.id)?.status;
 
   const isAdmin = myProfile?.role === "admin";
 
   const setRsvpAttending = setRsvp.bind(null, id, "attending");
+  const setRsvpPending = setRsvp.bind(null, id, "pending");
   const setRsvpNotAttending = setRsvp.bind(null, id, "not_attending");
   const removeEvent = deleteEvent.bind(null, id);
 
@@ -84,7 +86,11 @@ export default async function EventDetailPage({
           {event.capacity && (
             <div className="flex gap-2">
               <dt className="w-16 text-slate-400">定員</dt>
-              <dd>{event.capacity}人</dd>
+              <dd>
+                {event.capacity}人
+                {pending.length > 0 &&
+                  `（保留含め${attending.length + pending.length}人）`}
+              </dd>
             </div>
           )}
           {event.note && (
@@ -108,6 +114,18 @@ export default async function EventDetailPage({
               参加する
             </SubmitButton>
           </form>
+          <form action={setRsvpPending}>
+            <SubmitButton
+              pendingText="送信中…"
+              className={`px-4 py-2 rounded text-sm font-medium ${
+                myStatus === "pending"
+                  ? "bg-amber-500 text-white"
+                  : "bg-amber-50 text-amber-700 hover:bg-amber-100"
+              }`}
+            >
+              保留
+            </SubmitButton>
+          </form>
           <form action={setRsvpNotAttending}>
             <SubmitButton
               pendingText="送信中…"
@@ -123,7 +141,7 @@ export default async function EventDetailPage({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
         <div className="bg-white rounded-lg shadow-sm border p-4 min-w-0">
           <h2 className="font-medium text-sm mb-2 text-emerald-700">
             参加 ({attending.length})
@@ -132,6 +150,18 @@ export default async function EventDetailPage({
             {attending.map((r) => (
               <li key={r.user_id} className="break-words">
                 {r.profiles?.name ?? "不明"}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border p-4 min-w-0">
+          <h2 className="font-medium text-sm mb-2 text-amber-600">
+            保留 ({pending.length})
+          </h2>
+          <ul className="space-y-1 text-sm text-slate-600">
+            {pending.map((r) => (
+              <li key={r.user_id} className="break-words">
+                （{r.profiles?.name ?? "不明"}）
               </li>
             ))}
           </ul>

@@ -1,5 +1,5 @@
 export type Role = "admin" | "member";
-export type RsvpStatus = "attending" | "not_attending";
+export type RsvpStatus = "attending" | "not_attending" | "pending";
 
 export interface Profile {
   id: string;

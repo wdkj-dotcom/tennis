@@ -27,6 +27,9 @@ export default async function EventsPage() {
   const attendingFor = (eventId: string) =>
     (rsvps ?? []).filter((r) => r.event_id === eventId && r.status === "attending");
 
+  const pendingFor = (eventId: string) =>
+    (rsvps ?? []).filter((r) => r.event_id === eventId && r.status === "pending");
+
   const myStatusFor = (eventId: string) =>
     (rsvps ?? []).find((r) => r.event_id === eventId && r.user_id === profile?.id)
       ?.status;
@@ -41,8 +44,13 @@ export default async function EventsPage() {
         <ul className="space-y-3">
           {events.map((ev) => {
             const attending = attendingFor(ev.id);
+            const pending = pendingFor(ev.id);
             const status = myStatusFor(ev.id);
             const isPast = ev.event_date < today;
+            const names = [
+              ...attending.map((r) => r.profiles?.name ?? "不明"),
+              ...pending.map((r) => `(${r.profiles?.name ?? "不明"})`),
+            ];
             return (
               <li key={ev.id}>
                 <Link
@@ -66,19 +74,23 @@ export default async function EventsPage() {
                     <span className="text-sm text-slate-500 break-words">
                       参加 {attending.length}
                       {ev.capacity ? ` / ${ev.capacity}` : ""}人
+                      {pending.length > 0 && `（${attending.length + pending.length}人）`}
                       {status === "attending" && (
                         <span className="ml-2 text-emerald-600 font-medium">
                           参加予定
                         </span>
+                      )}
+                      {status === "pending" && (
+                        <span className="ml-2 text-amber-600 font-medium">保留</span>
                       )}
                       {status === "not_attending" && (
                         <span className="ml-2 text-slate-400">不参加</span>
                       )}
                     </span>
                   </div>
-                  {attending.length > 0 && (
+                  {names.length > 0 && (
                     <p className="mt-1 text-sm text-slate-500 break-words">
-                      {attending.map((r) => r.profiles?.name ?? "不明").join("、")}
+                      {names.join("、")}
                     </p>
                   )}
                 </Link>
