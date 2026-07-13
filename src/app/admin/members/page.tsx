@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/session";
+import MemberActions from "@/components/MemberActions";
 import type { Profile } from "@/types/database";
-import { addMember, setMemberRole } from "./actions";
+import { addMember, setMemberRole, renameMember, deleteMember } from "./actions";
 
 export default async function MembersPage({
   searchParams,
@@ -66,28 +67,28 @@ export default async function MembersPage({
 
       <div className="bg-white rounded-lg shadow-sm border divide-y">
         {(members ?? []).map((m) => {
-          const toggleRole = setMemberRole.bind(
-            null,
-            m.id,
-            m.role === "admin" ? "member" : "admin"
-          );
           const isSelf = m.id === profile.id;
           return (
-            <div key={m.id} className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm">
+            <div
+              key={m.id}
+              className="flex items-center justify-between gap-3 px-4 py-3 flex-wrap"
+            >
+              <span className="text-sm break-words">
                 {m.name}
                 {m.role === "admin" && (
                   <span className="ml-2 text-xs text-emerald-600">幹事</span>
                 )}
                 {isSelf && <span className="ml-2 text-xs text-slate-400">(自分)</span>}
               </span>
-              {!isSelf && (
-                <form action={toggleRole}>
-                  <button className="text-xs text-slate-500 hover:text-emerald-700">
-                    {m.role === "admin" ? "参加者にする" : "幹事にする"}
-                  </button>
-                </form>
-              )}
+              <MemberActions
+                memberId={m.id}
+                currentName={m.name}
+                role={m.role}
+                isSelf={isSelf}
+                renameMember={renameMember}
+                setMemberRole={setMemberRole}
+                deleteMember={deleteMember}
+              />
             </div>
           );
         })}
