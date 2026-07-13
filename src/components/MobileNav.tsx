@@ -20,7 +20,10 @@ export default function MobileNav({
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label="メニュー"
-        className="p-2 -mr-2 text-slate-600"
+        aria-expanded={open}
+        className={`p-2 -mr-2 rounded-md transition-colors ${
+          open ? "bg-slate-200 text-slate-900" : "text-slate-600 active:bg-slate-100"
+        }`}
       >
         {open ? (
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
