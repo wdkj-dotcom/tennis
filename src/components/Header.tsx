@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { getCurrentProfile } from "@/lib/session";
 import { signOut } from "@/app/login/actions";
+import { createAdminClient } from "@/lib/supabase/admin";
 import SubmitButton from "@/components/SubmitButton";
+import MonthFilter from "@/components/MonthFilter";
 import MobileNav from "./MobileNav";
 
 export default async function Header() {
@@ -11,12 +13,21 @@ export default async function Header() {
   const isAdmin = profile.role === "admin";
   const userLabel = `${profile.name}${isAdmin ? "（幹事）" : ""}`;
 
+  const supabase = createAdminClient();
+  const { data: events } = await supabase.from("events").select("event_date");
+  const months = Array.from(
+    new Set((events ?? []).map((ev) => ev.event_date.slice(0, 7)))
+  ).sort();
+
   return (
     <header className="border-b bg-white relative">
       <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/events" className="font-bold text-emerald-700">
-          テニスサークル
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/events" className="font-bold text-emerald-700">
+            開催日程
+          </Link>
+          {months.length > 0 && <MonthFilter months={months} />}
+        </div>
 
         <nav className="hidden sm:flex items-center gap-4 text-sm">
           <Link href="/events" className="text-slate-600 hover:text-emerald-700">
