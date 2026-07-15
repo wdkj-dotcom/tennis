@@ -66,6 +66,12 @@ export default async function EventDetailPage({
               >
                 編集
               </Link>
+              <Link
+                href={`/admin/events/new?copy=${event.id}`}
+                className="text-slate-500 hover:text-emerald-700"
+              >
+                複製
+              </Link>
               <form action={removeEvent}>
                 <SubmitButton
                   pendingText="削除中…"
