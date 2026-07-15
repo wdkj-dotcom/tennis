@@ -68,11 +68,8 @@ export default async function EventsPage() {
                   isPast ? "opacity-50" : ""
                 }`}
               >
-                <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3">
-                  <Link
-                    href={`/events/${ev.id}`}
-                    className="min-w-0 flex-1 hover:opacity-80"
-                  >
+                <div className="flex items-start gap-2">
+                  <Link href={`/events/${ev.id}`} className="min-w-0 flex-1 hover:opacity-80">
                     <div className="flex items-baseline gap-2 min-w-0">
                       <span className="text-lg font-bold shrink-0">
                         {formatEventTitle(ev)}
@@ -81,19 +78,6 @@ export default async function EventsPage() {
                         {ev.subtitle ? `${ev.subtitle}・` : ""}
                         {ev.location ?? "場所未定"}
                       </span>
-                      {status === "attending" && (
-                        <span className="shrink-0 text-xs text-emerald-600 font-medium">
-                          参加予定
-                        </span>
-                      )}
-                      {status === "pending" && (
-                        <span className="shrink-0 text-xs text-amber-600 font-medium">
-                          保留
-                        </span>
-                      )}
-                      {status === "not_attending" && (
-                        <span className="shrink-0 text-xs text-slate-400">不参加</span>
-                      )}
                     </div>
                     <p className="mt-1 text-sm text-slate-500 truncate">
                       {countLabel}
@@ -101,11 +85,11 @@ export default async function EventsPage() {
                     </p>
                   </Link>
 
-                  <div className="flex gap-1.5 shrink-0">
+                  <div className="flex flex-col gap-1 shrink-0">
                     <form action={setAttending}>
                       <SubmitButton
                         pendingText="…"
-                        className={`px-3 py-1 rounded text-xs font-medium ${
+                        className={`w-16 py-1 rounded text-xs font-medium ${
                           status === "attending"
                             ? "bg-emerald-600 text-white"
                             : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
@@ -117,7 +101,7 @@ export default async function EventsPage() {
                     <form action={setPending}>
                       <SubmitButton
                         pendingText="…"
-                        className={`px-3 py-1 rounded text-xs font-medium ${
+                        className={`w-16 py-1 rounded text-xs font-medium ${
                           status === "pending"
                             ? "bg-amber-500 text-white"
                             : "bg-amber-50 text-amber-700 hover:bg-amber-100"
@@ -129,7 +113,7 @@ export default async function EventsPage() {
                     <form action={setNotAttending}>
                       <SubmitButton
                         pendingText="…"
-                        className={`px-3 py-1 rounded text-xs font-medium ${
+                        className={`w-16 py-1 rounded text-xs font-medium ${
                           status === "not_attending"
                             ? "bg-slate-600 text-white"
                             : "bg-slate-100 text-slate-600 hover:bg-slate-200"
