@@ -17,7 +17,7 @@ export default function EventForm({
       {error && (
         <p className="text-sm text-red-600 bg-red-50 rounded px-3 py-2">{error}</p>
       )}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label className="block text-sm mb-1">日付</label>
           <input
@@ -25,7 +25,7 @@ export default function EventForm({
             type="date"
             required
             defaultValue={defaultValues?.event_date}
-            className="w-full border rounded px-3 py-2 text-sm"
+            className="w-full min-w-0 border rounded px-3 py-2 text-sm"
           />
         </div>
         <div>
@@ -34,7 +34,7 @@ export default function EventForm({
             name="start_time"
             type="time"
             defaultValue={defaultValues?.start_time ?? ""}
-            className="w-full border rounded px-3 py-2 text-sm"
+            className="w-full min-w-0 border rounded px-3 py-2 text-sm"
           />
         </div>
         <div>
@@ -43,7 +43,7 @@ export default function EventForm({
             name="end_time"
             type="time"
             defaultValue={defaultValues?.end_time ?? ""}
-            className="w-full border rounded px-3 py-2 text-sm"
+            className="w-full min-w-0 border rounded px-3 py-2 text-sm"
           />
         </div>
       </div>

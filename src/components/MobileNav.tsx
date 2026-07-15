@@ -62,6 +62,13 @@ export default function MobileNav({
                 >
                   メンバー管理
                 </Link>
+                <Link
+                  href="/admin/events/bulk-delete"
+                  className="py-3 border-b text-slate-600"
+                  onClick={() => setOpen(false)}
+                >
+                  日程を一括削除
+                </Link>
               </>
             )}
             <span className="py-3 border-b text-slate-400">{userLabel}</span>

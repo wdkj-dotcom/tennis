@@ -4,20 +4,35 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/session";
 import { formatEventTitle } from "@/lib/eventFormat";
 import SubmitButton from "@/components/SubmitButton";
+import MonthFilter from "@/components/MonthFilter";
 import type { Event, Rsvp } from "@/types/database";
 import { setRsvp } from "./[id]/actions";
 
-export default async function EventsPage() {
+export default async function EventsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ month?: string }>;
+}) {
   const profile = await getCurrentProfile();
   if (!profile) redirect("/login");
 
+  const { month } = await searchParams;
+
   const supabase = createAdminClient();
 
-  const { data: events } = await supabase
+  const { data: allEvents } = await supabase
     .from("events")
     .select("*")
     .order("event_date", { ascending: true })
     .returns<Event[]>();
+
+  const months = Array.from(
+    new Set((allEvents ?? []).map((ev) => ev.event_date.slice(0, 7)))
+  ).sort();
+
+  const events = month
+    ? (allEvents ?? []).filter((ev) => ev.event_date.startsWith(month))
+    : allEvents;
 
   const { data: rsvps } = await supabase
     .from("rsvps")
@@ -38,10 +53,15 @@ export default async function EventsPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-xl font-bold mb-6">日程一覧</h1>
+      <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
+        <h1 className="text-xl font-bold">日程一覧</h1>
+        {months.length > 0 && <MonthFilter months={months} current={month ?? "all"} />}
+      </div>
 
       {!events || events.length === 0 ? (
-        <p className="text-slate-500 text-sm">まだ日程が登録されていません。</p>
+        <p className="text-slate-500 text-sm">
+          {month ? "この月の日程はありません。" : "まだ日程が登録されていません。"}
+        </p>
       ) : (
         <ul className="space-y-2">
           {events.map((ev) => {
@@ -75,7 +95,7 @@ export default async function EventsPage() {
                     </span>
                     <span className="text-sm text-slate-500 truncate">
                       {ev.subtitle ? `${ev.subtitle}・` : ""}
-                      {ev.location ?? "場所未定"}
+                      {ev.location ?? "場所未定"}・{countLabel}
                     </span>
                   </div>
                 </Link>
@@ -85,8 +105,7 @@ export default async function EventsPage() {
                     href={`/events/${ev.id}`}
                     className="min-w-0 flex-1 text-sm text-slate-500 truncate hover:opacity-80"
                   >
-                    {countLabel}
-                    {names.length > 0 ? `・${names.join("、")}` : ""}
+                    {names.length > 0 ? names.join("、") : "―"}
                   </Link>
 
                   <div className="flex gap-1 shrink-0">

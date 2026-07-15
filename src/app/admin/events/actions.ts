@@ -58,3 +58,25 @@ export async function updateEvent(eventId: string, formData: FormData) {
   revalidatePath(`/events/${eventId}`);
   redirect(`/events/${eventId}`);
 }
+
+export async function bulkDeleteEvents(formData: FormData) {
+  const profile = await getCurrentProfile();
+  if (profile?.role !== "admin") redirect("/events");
+
+  const ids = formData.getAll("eventIds").map(String).filter(Boolean);
+  if (ids.length === 0) {
+    redirect(
+      `/admin/events/bulk-delete?error=${encodeURIComponent("削除する日程を選択してください")}`
+    );
+  }
+
+  const supabase = createAdminClient();
+  const { error } = await supabase.from("events").delete().in("id", ids);
+
+  if (error) {
+    redirect(`/admin/events/bulk-delete?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath("/events");
+  redirect("/events");
+}

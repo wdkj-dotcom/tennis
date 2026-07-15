@@ -36,6 +36,12 @@ export default async function Header() {
               >
                 メンバー管理
               </Link>
+              <Link
+                href="/admin/events/bulk-delete"
+                className="text-slate-600 hover:text-emerald-700"
+              >
+                日程を一括削除
+              </Link>
             </>
           )}
           <span className="text-slate-400">{userLabel}</span>
