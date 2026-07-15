@@ -18,8 +18,19 @@ create table if not exists events (
   location text,
   capacity int,
   note text,
+  status text not null default 'tentative'
+    check (status in ('tentative', 'confirmed', 'cancelled')),
   created_by uuid not null references profiles(id) on delete cascade,
   created_at timestamptz not null default now()
+);
+
+-- 特定メンバーだけに公開する日程の許可リスト。
+-- ある日程についてここに1件でも行があれば「リストにあるメンバー（＋幹事）だけに表示」、
+-- 1件もなければ「全員に表示」という扱いにする。
+create table if not exists event_visibility (
+  event_id uuid not null references events(id) on delete cascade,
+  profile_id uuid not null references profiles(id) on delete cascade,
+  primary key (event_id, profile_id)
 );
 
 create table if not exists rsvps (
@@ -32,4 +43,5 @@ create table if not exists rsvps (
 
 alter table profiles disable row level security;
 alter table events disable row level security;
+alter table event_visibility disable row level security;
 alter table rsvps disable row level security;

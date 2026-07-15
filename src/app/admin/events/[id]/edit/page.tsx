@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import EventForm from "@/components/EventForm";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/session";
-import type { Event } from "@/types/database";
+import type { Event, Profile } from "@/types/database";
 import { updateEvent } from "../../actions";
 
 export default async function EditEventPage({
@@ -27,6 +27,17 @@ export default async function EditEventPage({
 
   if (!event) notFound();
 
+  const { data: members } = await supabase
+    .from("profiles")
+    .select("*")
+    .order("created_at", { ascending: true })
+    .returns<Profile[]>();
+
+  const { data: visibility } = await supabase
+    .from("event_visibility")
+    .select("profile_id")
+    .eq("event_id", id);
+
   const action = updateEvent.bind(null, id);
 
   return (
@@ -35,6 +46,8 @@ export default async function EditEventPage({
       <EventForm
         action={action}
         defaultValues={event}
+        members={members ?? []}
+        visibleMemberIds={(visibility ?? []).map((v) => v.profile_id)}
         error={error}
         submitLabel="更新する"
       />

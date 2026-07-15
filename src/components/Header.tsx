@@ -14,9 +14,30 @@ export default async function Header() {
   const userLabel = `${profile.name}${isAdmin ? "（幹事）" : ""}`;
 
   const supabase = createAdminClient();
-  const { data: events } = await supabase.from("events").select("event_date");
+  const { data: events } = await supabase.from("events").select("id, event_date");
+
+  let visibleEvents = events ?? [];
+  if (!isAdmin) {
+    const { data: visibilityRows } = await supabase
+      .from("event_visibility")
+      .select("event_id, profile_id");
+
+    const restrictedEventIds = new Map<string, Set<string>>();
+    for (const row of visibilityRows ?? []) {
+      if (!restrictedEventIds.has(row.event_id)) {
+        restrictedEventIds.set(row.event_id, new Set());
+      }
+      restrictedEventIds.get(row.event_id)!.add(row.profile_id);
+    }
+
+    visibleEvents = visibleEvents.filter((ev) => {
+      const allowed = restrictedEventIds.get(ev.id);
+      return !allowed || allowed.has(profile.id);
+    });
+  }
+
   const months = Array.from(
-    new Set((events ?? []).map((ev) => ev.event_date.slice(0, 7)))
+    new Set(visibleEvents.map((ev) => ev.event_date.slice(0, 7)))
   ).sort();
 
   return (

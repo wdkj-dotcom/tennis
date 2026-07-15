@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import EventForm from "@/components/EventForm";
 import { getCurrentProfile } from "@/lib/session";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { Event } from "@/types/database";
+import type { Event, Profile } from "@/types/database";
 import { createEvent } from "../actions";
 
 export default async function NewEventPage({
@@ -15,9 +15,17 @@ export default async function NewEventPage({
 
   const { error, copy } = await searchParams;
 
+  const supabase = createAdminClient();
+
+  const { data: members } = await supabase
+    .from("profiles")
+    .select("*")
+    .order("created_at", { ascending: true })
+    .returns<Profile[]>();
+
   let defaultValues: Partial<Event> | undefined;
+  let visibleMemberIds: string[] | undefined;
   if (copy) {
-    const supabase = createAdminClient();
     const { data: source } = await supabase
       .from("events")
       .select("*")
@@ -26,6 +34,12 @@ export default async function NewEventPage({
     if (source) {
       defaultValues = { ...source, event_date: "" };
     }
+
+    const { data: visibility } = await supabase
+      .from("event_visibility")
+      .select("profile_id")
+      .eq("event_id", copy);
+    visibleMemberIds = (visibility ?? []).map((v) => v.profile_id);
   }
 
   return (
@@ -36,6 +50,8 @@ export default async function NewEventPage({
       <EventForm
         action={createEvent}
         defaultValues={defaultValues}
+        members={members ?? []}
+        visibleMemberIds={visibleMemberIds}
         error={error}
         submitLabel="作成する"
       />

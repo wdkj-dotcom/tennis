@@ -16,7 +16,7 @@ export default function MonthFilter({ months }: { months: string[] }) {
       }}
       className="border rounded px-2 py-1 text-sm bg-white"
     >
-      <option value="all">すべて</option>
+      <option value="all">今後の予定</option>
       {months.map((m) => {
         const [y, mo] = m.split("-");
         return (

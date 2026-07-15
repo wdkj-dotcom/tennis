@@ -4,8 +4,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/session";
 import { formatEventTitle } from "@/lib/eventFormat";
 import SubmitButton from "@/components/SubmitButton";
+import EventStatusBadge from "@/components/EventStatusBadge";
 import type { Event, Rsvp } from "@/types/database";
 import { setRsvp, deleteEvent } from "./actions";
+import { setEventStatus } from "@/app/admin/events/actions";
 
 export default async function EventDetailPage({
   params,
@@ -26,6 +28,17 @@ export default async function EventDetailPage({
 
   if (!event) notFound();
 
+  if (myProfile.role !== "admin") {
+    const { data: allowed } = await supabase
+      .from("event_visibility")
+      .select("profile_id")
+      .eq("event_id", id);
+
+    if (allowed && allowed.length > 0 && !allowed.some((a) => a.profile_id === myProfile.id)) {
+      notFound();
+    }
+  }
+
   const { data: rsvps } = await supabase
     .from("rsvps")
     .select("*, profiles(name)")
@@ -43,6 +56,9 @@ export default async function EventDetailPage({
   const setRsvpPending = setRsvp.bind(null, id, "pending");
   const setRsvpNotAttending = setRsvp.bind(null, id, "not_attending");
   const removeEvent = deleteEvent.bind(null, id);
+  const markTentative = setEventStatus.bind(null, id, "tentative");
+  const markConfirmed = setEventStatus.bind(null, id, "confirmed");
+  const markCancelled = setEventStatus.bind(null, id, "cancelled");
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
@@ -53,7 +69,10 @@ export default async function EventDetailPage({
       <div className="bg-white rounded-lg shadow-sm border p-6 mt-4">
         <div className="flex items-start justify-between gap-2 flex-wrap">
           <div>
-            <h1 className="text-xl font-bold break-words">{formatEventTitle(event)}</h1>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-xl font-bold break-words">{formatEventTitle(event)}</h1>
+              <EventStatusBadge status={event.status} />
+            </div>
             {event.subtitle && (
               <p className="text-sm text-slate-500 break-words">{event.subtitle}</p>
             )}
@@ -106,6 +125,47 @@ export default async function EventDetailPage({
             </div>
           )}
         </dl>
+
+        {isAdmin && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            <form action={markTentative}>
+              <SubmitButton
+                pendingText="…"
+                className={`px-3 py-1 rounded text-xs font-medium ${
+                  event.status === "tentative"
+                    ? "bg-slate-600 text-white"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                調整中にする
+              </SubmitButton>
+            </form>
+            <form action={markConfirmed}>
+              <SubmitButton
+                pendingText="…"
+                className={`px-3 py-1 rounded text-xs font-medium ${
+                  event.status === "confirmed"
+                    ? "bg-emerald-600 text-white"
+                    : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                }`}
+              >
+                開催決定にする
+              </SubmitButton>
+            </form>
+            <form action={markCancelled}>
+              <SubmitButton
+                pendingText="…"
+                className={`px-3 py-1 rounded text-xs font-medium ${
+                  event.status === "cancelled"
+                    ? "bg-red-600 text-white"
+                    : "bg-red-50 text-red-600 hover:bg-red-100"
+                }`}
+              >
+                中止にする
+              </SubmitButton>
+            </form>
+          </div>
+        )}
 
         <div className="mt-6 flex gap-3">
           <form action={setRsvpAttending}>

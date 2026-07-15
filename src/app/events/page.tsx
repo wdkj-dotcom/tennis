@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/session";
 import { formatEventTitle } from "@/lib/eventFormat";
 import SubmitButton from "@/components/SubmitButton";
+import EventStatusBadge from "@/components/EventStatusBadge";
 import type { Event, Rsvp } from "@/types/database";
 import { setRsvp } from "./[id]/actions";
 
@@ -19,22 +20,42 @@ export default async function EventsPage({
 
   const supabase = createAdminClient();
 
-  const { data: allEvents } = await supabase
+  const { data: allEventsRaw } = await supabase
     .from("events")
     .select("*")
     .order("event_date", { ascending: true })
     .returns<Event[]>();
 
+  const { data: visibilityRows } = await supabase
+    .from("event_visibility")
+    .select("event_id, profile_id");
+
+  const restrictedEventIds = new Map<string, Set<string>>();
+  for (const row of visibilityRows ?? []) {
+    if (!restrictedEventIds.has(row.event_id)) {
+      restrictedEventIds.set(row.event_id, new Set());
+    }
+    restrictedEventIds.get(row.event_id)!.add(row.profile_id);
+  }
+
+  const isVisible = (eventId: string) => {
+    if (profile.role === "admin") return true;
+    const allowed = restrictedEventIds.get(eventId);
+    return !allowed || allowed.has(profile.id);
+  };
+
+  const allEvents = (allEventsRaw ?? []).filter((ev) => isVisible(ev.id));
+
+  const today = new Date().toISOString().slice(0, 10);
+
   const events = month
-    ? (allEvents ?? []).filter((ev) => ev.event_date.startsWith(month))
-    : allEvents;
+    ? allEvents.filter((ev) => ev.event_date.startsWith(month))
+    : allEvents.filter((ev) => ev.event_date >= today);
 
   const { data: rsvps } = await supabase
     .from("rsvps")
     .select("*, profiles(name)")
     .returns<(Rsvp & { profiles: { name: string } | null })[]>();
-
-  const today = new Date().toISOString().slice(0, 10);
 
   const attendingFor = (eventId: string) =>
     (rsvps ?? []).filter((r) => r.event_id === eventId && r.status === "attending");
@@ -50,7 +71,7 @@ export default async function EventsPage({
     <div className="max-w-3xl mx-auto px-4 py-4">
       {!events || events.length === 0 ? (
         <p className="text-slate-500 text-sm">
-          {month ? "この月の日程はありません。" : "まだ日程が登録されていません。"}
+          {month ? "この月の日程はありません。" : "今後の日程はありません。"}
         </p>
       ) : (
         <ul className="divide-y bg-white">
@@ -63,7 +84,7 @@ export default async function EventsPage({
               ...attending.map((r) => r.profiles?.name ?? "不明"),
               ...pending.map((r) => `(${r.profiles?.name ?? "不明"})`),
             ];
-            const countLabel = `参加${attending.length}${
+            const countLabel = `${attending.length}${
               ev.capacity ? `/${ev.capacity}` : ""
             }人${pending.length > 0 ? `（${attending.length + pending.length}人）` : ""}`;
 
@@ -78,6 +99,7 @@ export default async function EventsPage({
                     <span className="text-base font-bold shrink-0">
                       {formatEventTitle(ev)}
                     </span>
+                    <EventStatusBadge status={ev.status} />
                     <span className="text-sm text-slate-500 truncate">
                       {ev.subtitle ? `${ev.subtitle}・` : ""}
                       {ev.location ?? "場所未定"}・{countLabel}

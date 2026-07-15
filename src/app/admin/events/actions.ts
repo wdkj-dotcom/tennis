@@ -4,8 +4,10 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/session";
+import type { EventStatus } from "@/types/database";
 
 function parseEventForm(formData: FormData) {
+  const status = String(formData.get("status") ?? "tentative");
   return {
     subtitle: (formData.get("subtitle") as string) || null,
     event_date: String(formData.get("event_date")),
@@ -16,7 +18,23 @@ function parseEventForm(formData: FormData) {
       ? Number(formData.get("capacity"))
       : null,
     note: (formData.get("note") as string) || null,
+    status: (["tentative", "confirmed", "cancelled"].includes(status)
+      ? status
+      : "tentative") as EventStatus,
   };
+}
+
+async function syncVisibility(eventId: string, formData: FormData) {
+  const supabase = createAdminClient();
+  const memberIds = formData.getAll("visibleMemberIds").map(String).filter(Boolean);
+
+  await supabase.from("event_visibility").delete().eq("event_id", eventId);
+
+  if (memberIds.length > 0) {
+    await supabase
+      .from("event_visibility")
+      .insert(memberIds.map((profile_id) => ({ event_id: eventId, profile_id })));
+  }
 }
 
 export async function createEvent(formData: FormData) {
@@ -34,6 +52,8 @@ export async function createEvent(formData: FormData) {
   if (error) {
     redirect(`/admin/events/new?error=${encodeURIComponent(error.message)}`);
   }
+
+  await syncVisibility(data!.id, formData);
 
   revalidatePath("/events");
   redirect(`/events/${data!.id}`);
@@ -54,9 +74,22 @@ export async function updateEvent(eventId: string, formData: FormData) {
     );
   }
 
+  await syncVisibility(eventId, formData);
+
   revalidatePath("/events");
   revalidatePath(`/events/${eventId}`);
   redirect(`/events/${eventId}`);
+}
+
+export async function setEventStatus(eventId: string, status: EventStatus) {
+  const profile = await getCurrentProfile();
+  if (profile?.role !== "admin") redirect("/events");
+
+  const supabase = createAdminClient();
+  await supabase.from("events").update({ status }).eq("id", eventId);
+
+  revalidatePath("/events");
+  revalidatePath(`/events/${eventId}`);
 }
 
 export async function bulkDeleteEvents(formData: FormData) {
