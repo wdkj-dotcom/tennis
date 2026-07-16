@@ -2,7 +2,7 @@ import type { EventStatus } from "@/types/database";
 
 const LABELS: Record<EventStatus, string> = {
   tentative: "調整中",
-  confirmed: "開催決定",
+  confirmed: "開催",
   cancelled: "中止",
 };
 
