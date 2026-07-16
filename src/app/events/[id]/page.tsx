@@ -111,11 +111,7 @@ export default async function EventDetailPage({
           {event.capacity && (
             <div className="flex gap-2">
               <dt className="w-16 text-slate-400">定員</dt>
-              <dd>
-                {event.capacity}人
-                {pending.length > 0 &&
-                  `（保留含め${attending.length + pending.length}人）`}
-              </dd>
+              <dd>{event.capacity}人</dd>
             </div>
           )}
           {event.note && (

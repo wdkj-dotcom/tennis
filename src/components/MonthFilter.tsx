@@ -12,7 +12,14 @@ export default function MonthFilter({ months }: { months: string[] }) {
       value={months.includes(current) ? current : "all"}
       onChange={(e) => {
         const value = e.target.value;
-        router.push(value === "all" ? "/events" : `/events?month=${value}`);
+        const params = new URLSearchParams(searchParams.toString());
+        if (value === "all") {
+          params.delete("month");
+        } else {
+          params.set("month", value);
+        }
+        const query = params.toString();
+        router.push(query ? `/events?${query}` : "/events");
       }}
       className="border rounded px-2 py-1 text-sm bg-white"
     >

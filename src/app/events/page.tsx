@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/session";
 import { formatEventTitle } from "@/lib/eventFormat";
 import SubmitButton from "@/components/SubmitButton";
+import EventStatusBadge from "@/components/EventStatusBadge";
 import type { Event, Rsvp } from "@/types/database";
 
 const STATUS_ROW_CLASS = {
@@ -16,12 +17,12 @@ import { setRsvp } from "./[id]/actions";
 export default async function EventsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ month?: string }>;
+  searchParams: Promise<{ month?: string; includeCancelled?: string }>;
 }) {
   const profile = await getCurrentProfile();
   if (!profile) redirect("/login");
 
-  const { month } = await searchParams;
+  const { month, includeCancelled } = await searchParams;
 
   const supabase = createAdminClient();
 
@@ -29,6 +30,7 @@ export default async function EventsPage({
     .from("events")
     .select("*")
     .order("event_date", { ascending: true })
+    .order("start_time", { ascending: true, nullsFirst: true })
     .returns<Event[]>();
 
   const { data: visibilityRows } = await supabase
@@ -49,7 +51,9 @@ export default async function EventsPage({
     return !allowed || allowed.has(profile.id);
   };
 
-  const allEvents = (allEventsRaw ?? []).filter((ev) => isVisible(ev.id));
+  const allEvents = (allEventsRaw ?? [])
+    .filter((ev) => isVisible(ev.id))
+    .filter((ev) => includeCancelled === "1" || ev.status !== "cancelled");
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -91,7 +95,7 @@ export default async function EventsPage({
             ];
             const countLabel = `${attending.length}${
               ev.capacity ? `/${ev.capacity}` : ""
-            }人${pending.length > 0 ? `（${attending.length + pending.length}人）` : ""}`;
+            }人`;
 
             const setAttending = setRsvp.bind(null, ev.id, "attending");
             const setPending = setRsvp.bind(null, ev.id, "pending");
@@ -111,6 +115,7 @@ export default async function EventsPage({
                     <span className="text-base font-bold shrink-0">
                       {formatEventTitle(ev)}
                     </span>
+                    <EventStatusBadge status={ev.status} />
                     <span className="text-sm truncate opacity-80">
                       {ev.subtitle ? `${ev.subtitle}・` : ""}
                       {ev.location ?? "場所未定"}・{countLabel}

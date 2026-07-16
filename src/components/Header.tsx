@@ -4,6 +4,7 @@ import { signOut } from "@/app/login/actions";
 import { createAdminClient } from "@/lib/supabase/admin";
 import SubmitButton from "@/components/SubmitButton";
 import MonthFilter from "@/components/MonthFilter";
+import IncludeCancelledToggle from "@/components/IncludeCancelledToggle";
 import MobileNav from "./MobileNav";
 
 export default async function Header() {
@@ -48,6 +49,7 @@ export default async function Header() {
             開催日程
           </Link>
           {months.length > 0 && <MonthFilter months={months} />}
+          <IncludeCancelledToggle />
         </div>
 
         <nav className="hidden sm:flex items-center gap-4 text-sm">
