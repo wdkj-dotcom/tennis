@@ -72,6 +72,9 @@ export default async function EventsPage({
   const pendingFor = (eventId: string) =>
     (rsvps ?? []).filter((r) => r.event_id === eventId && r.status === "pending");
 
+  const notAttendingFor = (eventId: string) =>
+    (rsvps ?? []).filter((r) => r.event_id === eventId && r.status === "not_attending");
+
   const myStatusFor = (eventId: string) =>
     (rsvps ?? []).find((r) => r.event_id === eventId && r.user_id === profile?.id)
       ?.status;
@@ -87,6 +90,7 @@ export default async function EventsPage({
           {events.map((ev) => {
             const attending = attendingFor(ev.id);
             const pending = pendingFor(ev.id);
+            const notAttending = notAttendingFor(ev.id);
             const status = myStatusFor(ev.id);
             const isPast = ev.event_date < today;
             const names = [
@@ -95,7 +99,7 @@ export default async function EventsPage({
             ];
             const countLabel = `${attending.length}${
               ev.capacity ? `/${ev.capacity}` : ""
-            }人`;
+            }人${notAttending.length > 0 ? `（${notAttending.length}）` : ""}`;
 
             const setAttending = setRsvp.bind(null, ev.id, "attending");
             const setPending = setRsvp.bind(null, ev.id, "pending");
