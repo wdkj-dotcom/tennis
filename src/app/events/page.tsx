@@ -4,8 +4,13 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/session";
 import { formatEventTitle } from "@/lib/eventFormat";
 import SubmitButton from "@/components/SubmitButton";
-import EventStatusBadge from "@/components/EventStatusBadge";
 import type { Event, Rsvp } from "@/types/database";
+
+const STATUS_ROW_CLASS = {
+  tentative: "",
+  confirmed: "bg-emerald-100",
+  cancelled: "text-slate-300",
+} as const;
 import { setRsvp } from "./[id]/actions";
 
 export default async function EventsPage({
@@ -92,15 +97,21 @@ export default async function EventsPage({
             const setPending = setRsvp.bind(null, ev.id, "pending");
             const setNotAttending = setRsvp.bind(null, ev.id, "not_attending");
 
+            const statusClass = STATUS_ROW_CLASS[ev.status];
+
             return (
-              <li key={ev.id} className={`py-1.5 ${isPast ? "opacity-50" : ""}`}>
+              <li
+                key={ev.id}
+                className={`py-1.5 px-2 -mx-2 rounded ${statusClass} ${
+                  isPast ? "opacity-50" : ""
+                }`}
+              >
                 <Link href={`/events/${ev.id}`} className="block hover:opacity-80">
                   <div className="flex items-baseline gap-2 min-w-0">
                     <span className="text-base font-bold shrink-0">
                       {formatEventTitle(ev)}
                     </span>
-                    <EventStatusBadge status={ev.status} />
-                    <span className="text-sm text-slate-500 truncate">
+                    <span className="text-sm truncate opacity-80">
                       {ev.subtitle ? `${ev.subtitle}・` : ""}
                       {ev.location ?? "場所未定"}・{countLabel}
                     </span>
@@ -110,7 +121,7 @@ export default async function EventsPage({
                 <div className="flex items-center gap-2">
                   <Link
                     href={`/events/${ev.id}`}
-                    className="min-w-0 flex-1 text-sm text-slate-500 truncate hover:opacity-80"
+                    className="min-w-0 flex-1 text-sm truncate opacity-80 hover:opacity-60"
                   >
                     {names.length > 0 ? names.join("、") : "―"}
                   </Link>
