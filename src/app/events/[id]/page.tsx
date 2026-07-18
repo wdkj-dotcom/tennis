@@ -60,6 +60,18 @@ export default async function EventDetailPage({
   const markConfirmed = setEventStatus.bind(null, id, "confirmed");
   const markCancelled = setEventStatus.bind(null, id, "cancelled");
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tennis-taupe-seven.vercel.app";
+  const eventUrl = `${siteUrl}/events/${event.id}`;
+  const shareText = [
+    formatEventTitle(event),
+    event.subtitle,
+    event.location ? `場所: ${event.location}` : null,
+    eventUrl,
+  ]
+    .filter(Boolean)
+    .join("\n");
+  const lineShareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`;
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       <Link href="/events" className="text-sm text-emerald-600 hover:underline">
@@ -201,6 +213,18 @@ export default async function EventDetailPage({
             </SubmitButton>
           </form>
         </div>
+
+        <a
+          href={lineShareUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex items-center gap-1.5 text-sm text-[#06C755] hover:underline"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 5.94 2 10.8c0 4.36 3.58 8 8.44 8.68.33.07.78.22.9.5.1.26.07.66.03.92l-.15.9c-.05.26-.2 1.03.9.56 1.1-.47 5.94-3.5 8.1-6 1.5-1.65 2.28-3.33 2.28-5.56C22.5 5.94 17.52 2 12 2z" />
+          </svg>
+          LINEで共有
+        </a>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
