@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
@@ -16,6 +16,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "テニスサークル日程管理",
   description: "テニスサークルの日程・参加者管理システム",
+};
+
+export const viewport: Viewport = {
+  colorScheme: "light",
 };
 
 export default function RootLayout({

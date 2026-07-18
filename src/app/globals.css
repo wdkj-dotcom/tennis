@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  color-scheme: light;
 }
 
 @theme inline {
@@ -12,12 +13,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* このアプリは配色を全て明示的に light 前提で組んでいるため、
+   OS/ブラウザのダークモードに合わせて背景・文字色を反転させない。
+   反転させると、明示的な背景色（bg-emerald-100など）の上で
+   文字色だけがダークモード用の白系になり読めなくなる不具合が起きる。 */
 
 html,
 body {
