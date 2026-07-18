@@ -7,11 +7,15 @@ import SubmitButton from "@/components/SubmitButton";
 import EventStatusBadge from "@/components/EventStatusBadge";
 import type { Event, Rsvp } from "@/types/database";
 
-const STATUS_ROW_CLASS = {
-  tentative: "",
-  confirmed: "bg-emerald-100",
-  cancelled: "text-slate-300",
-} as const;
+function getRowClass(eventStatus: Event["status"], myStatus: string | undefined) {
+  if (eventStatus === "cancelled" || myStatus === "not_attending") {
+    return "text-slate-300";
+  }
+  if (eventStatus === "confirmed" && myStatus === "attending") {
+    return "bg-emerald-100";
+  }
+  return "";
+}
 import { setRsvp } from "./[id]/actions";
 
 export default async function EventsPage({
@@ -105,7 +109,7 @@ export default async function EventsPage({
             const setPending = setRsvp.bind(null, ev.id, "pending");
             const setNotAttending = setRsvp.bind(null, ev.id, "not_attending");
 
-            const statusClass = STATUS_ROW_CLASS[ev.status];
+            const statusClass = getRowClass(ev.status, status);
 
             return (
               <li
