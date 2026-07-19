@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/session";
+import { getAllEvents, getVisibilityRows } from "@/lib/events-data";
 import { formatEventTitle } from "@/lib/eventFormat";
 import SubmitButton from "@/components/SubmitButton";
 import EventStatusBadge from "@/components/EventStatusBadge";
@@ -30,19 +31,17 @@ export default async function EventsPage({
 
   const supabase = createAdminClient();
 
-  const { data: allEventsRaw } = await supabase
-    .from("events")
-    .select("*")
-    .order("event_date", { ascending: true })
-    .order("start_time", { ascending: true, nullsFirst: true })
-    .returns<Event[]>();
-
-  const { data: visibilityRows } = await supabase
-    .from("event_visibility")
-    .select("event_id, profile_id");
+  const [allEventsRaw, visibilityRows, { data: rsvps }] = await Promise.all([
+    getAllEvents(),
+    getVisibilityRows(),
+    supabase
+      .from("rsvps")
+      .select("*, profiles(name)")
+      .returns<(Rsvp & { profiles: { name: string } | null })[]>(),
+  ]);
 
   const restrictedEventIds = new Map<string, Set<string>>();
-  for (const row of visibilityRows ?? []) {
+  for (const row of visibilityRows) {
     if (!restrictedEventIds.has(row.event_id)) {
       restrictedEventIds.set(row.event_id, new Set());
     }
@@ -55,7 +54,7 @@ export default async function EventsPage({
     return !allowed || allowed.has(profile.id);
   };
 
-  const allEvents = (allEventsRaw ?? [])
+  const allEvents = allEventsRaw
     .filter((ev) => isVisible(ev.id))
     .filter((ev) => includeCancelled === "1" || ev.status !== "cancelled");
 
@@ -64,11 +63,6 @@ export default async function EventsPage({
   const events = month
     ? allEvents.filter((ev) => ev.event_date.startsWith(month))
     : allEvents.filter((ev) => ev.event_date >= today);
-
-  const { data: rsvps } = await supabase
-    .from("rsvps")
-    .select("*, profiles(name)")
-    .returns<(Rsvp & { profiles: { name: string } | null })[]>();
 
   const attendingFor = (eventId: string) =>
     (rsvps ?? []).filter((r) => r.event_id === eventId && r.status === "attending");

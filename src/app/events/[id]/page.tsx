@@ -20,30 +20,28 @@ export default async function EventDetailPage({
   const { id } = await params;
   const supabase = createAdminClient();
 
-  const { data: event } = await supabase
-    .from("events")
-    .select("*")
-    .eq("id", id)
-    .single<Event>();
+  const [{ data: event }, { data: allowed }, { data: rsvps }] = await Promise.all([
+    supabase.from("events").select("*").eq("id", id).single<Event>(),
+    myProfile.role !== "admin"
+      ? supabase.from("event_visibility").select("profile_id").eq("event_id", id)
+      : Promise.resolve({ data: null }),
+    supabase
+      .from("rsvps")
+      .select("*, profiles(name)")
+      .eq("event_id", id)
+      .returns<(Rsvp & { profiles: { name: string } | null })[]>(),
+  ]);
 
   if (!event) notFound();
 
-  if (myProfile.role !== "admin") {
-    const { data: allowed } = await supabase
-      .from("event_visibility")
-      .select("profile_id")
-      .eq("event_id", id);
-
-    if (allowed && allowed.length > 0 && !allowed.some((a) => a.profile_id === myProfile.id)) {
-      notFound();
-    }
+  if (
+    myProfile.role !== "admin" &&
+    allowed &&
+    allowed.length > 0 &&
+    !allowed.some((a) => a.profile_id === myProfile.id)
+  ) {
+    notFound();
   }
-
-  const { data: rsvps } = await supabase
-    .from("rsvps")
-    .select("*, profiles(name)")
-    .eq("event_id", id)
-    .returns<(Rsvp & { profiles: { name: string } | null })[]>();
 
   const attending = (rsvps ?? []).filter((r) => r.status === "attending");
   const pending = (rsvps ?? []).filter((r) => r.status === "pending");

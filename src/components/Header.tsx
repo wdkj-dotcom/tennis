@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getCurrentProfile } from "@/lib/session";
 import { signOut } from "@/app/login/actions";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { getAllEvents, getVisibilityRows } from "@/lib/events-data";
 import SubmitButton from "@/components/SubmitButton";
 import MonthFilter from "@/components/MonthFilter";
 import IncludeCancelledToggle from "@/components/IncludeCancelledToggle";
@@ -14,17 +14,15 @@ export default async function Header() {
   const isAdmin = profile.role === "admin";
   const userLabel = `${profile.name}${isAdmin ? "（幹事）" : ""}`;
 
-  const supabase = createAdminClient();
-  const { data: events } = await supabase.from("events").select("id, event_date");
+  const [events, visibilityRows] = await Promise.all([
+    getAllEvents(),
+    isAdmin ? Promise.resolve([]) : getVisibilityRows(),
+  ]);
 
-  let visibleEvents = events ?? [];
+  let visibleEvents = events;
   if (!isAdmin) {
-    const { data: visibilityRows } = await supabase
-      .from("event_visibility")
-      .select("event_id, profile_id");
-
     const restrictedEventIds = new Map<string, Set<string>>();
-    for (const row of visibilityRows ?? []) {
+    for (const row of visibilityRows) {
       if (!restrictedEventIds.has(row.event_id)) {
         restrictedEventIds.set(row.event_id, new Set());
       }
