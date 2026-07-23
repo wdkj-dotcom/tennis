@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavLink from "@/components/NavLink";
 import type { Event } from "@/types/database";
 
 const STATUS_DOT: Record<Event["status"], string> = {
@@ -13,13 +13,10 @@ export default function EventsCalendar({
   displayMonth,
   events,
   today,
-  selectedEventId,
-  includeCancelled,
 }: {
   displayMonth: string; // "YYYY-MM"
   events: Event[];
   today: string; // "YYYY-MM-DD"
-  selectedEventId?: string;
   includeCancelled?: string;
 }) {
   const [year, month] = displayMonth.split("-").map(Number);
@@ -71,34 +68,21 @@ export default function EventsCalendar({
                 {day}
               </div>
               <div className="space-y-0.5">
-                {dayEvents.map((ev) => {
-                  const params = new URLSearchParams();
-                  params.set("view", "calendar");
-                  params.set("month", displayMonth);
-                  params.set("eventId", ev.id);
-                  if (includeCancelled === "1") params.set("includeCancelled", "1");
-                  const isSelected = ev.id === selectedEventId;
-                  return (
-                    <Link
-                      key={ev.id}
-                      href={`/events?${params}`}
-                      scroll={false}
-                      className={`flex items-center gap-1 text-[11px] leading-tight rounded px-0.5 truncate ${
-                        isSelected
-                          ? "bg-emerald-100 text-emerald-800 font-medium"
-                          : "text-slate-700 hover:bg-slate-100"
-                      }`}
-                    >
-                      <span
-                        className={`shrink-0 w-1.5 h-1.5 rounded-full ${STATUS_DOT[ev.status]}`}
-                      />
-                      <span className="truncate">
-                        {ev.start_time ? ev.start_time.slice(0, 5) : ""}
-                        {ev.subtitle ? ` ${ev.subtitle}` : ""}
-                      </span>
-                    </Link>
-                  );
-                })}
+                {dayEvents.map((ev) => (
+                  <NavLink
+                    key={ev.id}
+                    href={`/events/${ev.id}`}
+                    className="flex items-center gap-1 text-[11px] leading-tight text-slate-700 hover:bg-slate-100 rounded px-0.5 truncate"
+                  >
+                    <span
+                      className={`shrink-0 w-1.5 h-1.5 rounded-full ${STATUS_DOT[ev.status]}`}
+                    />
+                    <span className="truncate">
+                      {ev.start_time ? ev.start_time.slice(0, 5) : ""}
+                      {ev.subtitle ? ` ${ev.subtitle}` : ""}
+                    </span>
+                  </NavLink>
+                ))}
               </div>
             </div>
           );

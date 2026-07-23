@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavLink from "@/components/NavLink";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/session";
@@ -8,7 +8,6 @@ import SubmitButton from "@/components/SubmitButton";
 import EventStatusBadge from "@/components/EventStatusBadge";
 import EventsCalendar from "@/components/EventsCalendar";
 import CalendarMonthNav from "@/components/CalendarMonthNav";
-import EventDetailContent from "./[id]/EventDetailContent";
 import type { Event, Rsvp } from "@/types/database";
 
 function getRowClass(eventStatus: Event["status"], myStatus: string | undefined) {
@@ -29,13 +28,12 @@ export default async function EventsPage({
     month?: string;
     includeCancelled?: string;
     view?: string;
-    eventId?: string;
   }>;
 }) {
   const profile = await getCurrentProfile();
   if (!profile) redirect("/login");
 
-  const { month, includeCancelled, view, eventId } = await searchParams;
+  const { month, includeCancelled, view } = await searchParams;
   const isCalendarView = view === "calendar";
 
   const supabase = createAdminClient();
@@ -102,7 +100,7 @@ export default async function EventsPage({
   return (
     <div className="max-w-3xl mx-auto px-4 py-4">
       <div className="flex gap-1 mb-3">
-        <Link
+        <NavLink
           href={listHref}
           className={`px-3 py-1 rounded text-sm font-medium ${
             !isCalendarView
@@ -111,8 +109,8 @@ export default async function EventsPage({
           }`}
         >
           リスト
-        </Link>
-        <Link
+        </NavLink>
+        <NavLink
           href={calendarHref}
           className={`px-3 py-1 rounded text-sm font-medium ${
             isCalendarView
@@ -121,7 +119,7 @@ export default async function EventsPage({
           }`}
         >
           カレンダー
-        </Link>
+        </NavLink>
       </div>
 
       {isCalendarView ? (
@@ -131,14 +129,8 @@ export default async function EventsPage({
             displayMonth={displayMonth}
             events={events}
             today={today}
-            selectedEventId={eventId}
             includeCancelled={includeCancelled}
           />
-          {eventId && (
-            <div className="mt-3">
-              <EventDetailContent id={eventId} bare />
-            </div>
-          )}
         </>
       ) : !events || events.length === 0 ? (
         <p className="text-slate-500 text-sm">
@@ -173,7 +165,7 @@ export default async function EventsPage({
                   isPast ? "opacity-50" : ""
                 }`}
               >
-                <Link href={`/events/${ev.id}`} className="block hover:opacity-80">
+                <NavLink href={`/events/${ev.id}`} className="block hover:opacity-80">
                   <div className="flex items-baseline gap-2 min-w-0">
                     <span className="text-base font-bold shrink-0">
                       {formatEventTitle(ev)}
@@ -184,15 +176,15 @@ export default async function EventsPage({
                       {ev.location ?? "場所未定"}・{countLabel}
                     </span>
                   </div>
-                </Link>
+                </NavLink>
 
                 <div className="flex items-center gap-2">
-                  <Link
+                  <NavLink
                     href={`/events/${ev.id}`}
                     className="min-w-0 flex-1 text-sm truncate opacity-80 hover:opacity-60"
                   >
                     {names.length > 0 ? names.join("、") : "―"}
-                  </Link>
+                  </NavLink>
 
                   <div className="flex gap-1 shrink-0">
                     <form action={setAttending}>

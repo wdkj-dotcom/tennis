@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavLink from "@/components/NavLink";
 import { notFound, redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/session";
@@ -91,18 +91,18 @@ export default async function EventDetailContent({
           </div>
           {isAdmin && (
             <div className="flex gap-3 text-xs shrink-0">
-              <Link
+              <NavLink
                 href={`/admin/events/${event.id}/edit`}
                 className="text-slate-500 hover:text-emerald-700"
               >
                 編集
-              </Link>
-              <Link
+              </NavLink>
+              <NavLink
                 href={`/admin/events/new?copy=${event.id}`}
                 className="text-slate-500 hover:text-emerald-700"
               >
                 複製
-              </Link>
+              </NavLink>
               <form action={removeEvent}>
                 <SubmitButton
                   pendingText="削除中…"
@@ -262,9 +262,9 @@ export default async function EventDetailContent({
   return (
     <div className={`max-w-3xl mx-auto px-4 ${isModal ? "py-4" : "py-8"}`}>
       {!isModal && (
-        <Link href="/events" className="text-sm text-emerald-600 hover:underline">
+        <NavLink href="/events" className="text-sm text-emerald-600 hover:underline">
           ← 日程一覧に戻る
-        </Link>
+        </NavLink>
       )}
       {card}
     </div>

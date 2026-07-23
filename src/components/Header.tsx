@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavLink from "@/components/NavLink";
 import { getCurrentProfile } from "@/lib/session";
 import { signOut } from "@/app/login/actions";
 import { getAllEvents, getVisibilityRows } from "@/lib/events-data";
@@ -43,37 +43,37 @@ export default async function Header() {
     <header className="border-b bg-white relative z-40">
       <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/events" className="font-bold text-emerald-700">
+          <NavLink href="/events" className="font-bold text-emerald-700">
             開催日程
-          </Link>
+          </NavLink>
           {months.length > 0 && <MonthFilter months={months} />}
           <IncludeCancelledToggle />
         </div>
 
         <nav className="hidden sm:flex items-center gap-4 text-sm">
-          <Link href="/events" className="text-slate-600 hover:text-emerald-700">
+          <NavLink href="/events" className="text-slate-600 hover:text-emerald-700">
             日程一覧
-          </Link>
+          </NavLink>
           {isAdmin && (
             <>
-              <Link
+              <NavLink
                 href="/admin/events/new"
                 className="text-slate-600 hover:text-emerald-700"
               >
                 日程作成
-              </Link>
-              <Link
+              </NavLink>
+              <NavLink
                 href="/admin/members"
                 className="text-slate-600 hover:text-emerald-700"
               >
                 メンバー管理
-              </Link>
-              <Link
+              </NavLink>
+              <NavLink
                 href="/admin/events/bulk-delete"
                 className="text-slate-600 hover:text-emerald-700"
               >
                 日程を一括削除
-              </Link>
+              </NavLink>
             </>
           )}
           <span className="text-slate-400">{userLabel}</span>

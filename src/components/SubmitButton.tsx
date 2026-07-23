@@ -2,6 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 import type { ButtonHTMLAttributes } from "react";
+import SpinnerIcon from "./SpinnerIcon";
 
 export default function SubmitButton({
   children,
@@ -17,9 +18,10 @@ export default function SubmitButton({
     <button
       type="submit"
       disabled={pending}
-      className={`${className ?? ""} disabled:opacity-60 disabled:cursor-wait`}
+      className={`${className ?? ""} disabled:opacity-60 disabled:cursor-wait inline-flex items-center justify-center gap-1.5`}
       {...rest}
     >
+      {pending && <SpinnerIcon />}
       {pending ? pendingText ?? "処理中…" : children}
     </button>
   );

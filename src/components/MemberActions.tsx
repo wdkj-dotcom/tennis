@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import SpinnerIcon from "./SpinnerIcon";
 import type { Role } from "@/types/database";
 
 type ActionResult = { error?: string };
@@ -52,8 +53,9 @@ export default function MemberActions({
       <button
         onClick={handleRename}
         disabled={isPending}
-        className="text-slate-500 hover:text-emerald-700 disabled:opacity-50 disabled:cursor-wait"
+        className="inline-flex items-center gap-1 text-slate-500 hover:text-emerald-700 disabled:opacity-50 disabled:cursor-wait"
       >
+        {isPending && <SpinnerIcon />}
         名前を変更
       </button>
       {!isSelf && (
@@ -61,15 +63,17 @@ export default function MemberActions({
           <button
             onClick={handleToggleRole}
             disabled={isPending}
-            className="text-slate-500 hover:text-emerald-700 disabled:opacity-50 disabled:cursor-wait"
+            className="inline-flex items-center gap-1 text-slate-500 hover:text-emerald-700 disabled:opacity-50 disabled:cursor-wait"
           >
+            {isPending && <SpinnerIcon />}
             {isPending ? "処理中…" : role === "admin" ? "参加者にする" : "幹事にする"}
           </button>
           <button
             onClick={handleDelete}
             disabled={isPending}
-            className="text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-wait"
+            className="inline-flex items-center gap-1 text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-wait"
           >
+            {isPending && <SpinnerIcon />}
             {isPending ? "処理中…" : "削除"}
           </button>
         </>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import NavLink from "@/components/NavLink";
 import SubmitButton from "@/components/SubmitButton";
 
 export default function MobileNav({
@@ -39,36 +39,36 @@ export default function MobileNav({
       {open && (
         <div className="absolute left-0 right-0 top-full z-50 bg-white border-b shadow-lg">
           <nav className="flex flex-col px-4 py-2 text-sm bg-white">
-            <Link
+            <NavLink
               href="/events"
               className="py-3 border-b text-slate-600"
               onClick={() => setOpen(false)}
             >
               日程一覧
-            </Link>
+            </NavLink>
             {isAdmin && (
               <>
-                <Link
+                <NavLink
                   href="/admin/events/new"
                   className="py-3 border-b text-slate-600"
                   onClick={() => setOpen(false)}
                 >
                   日程作成
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   href="/admin/members"
                   className="py-3 border-b text-slate-600"
                   onClick={() => setOpen(false)}
                 >
                   メンバー管理
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   href="/admin/events/bulk-delete"
                   className="py-3 border-b text-slate-600"
                   onClick={() => setOpen(false)}
                 >
                   日程を一括削除
-                </Link>
+                </NavLink>
               </>
             )}
             <span className="py-3 border-b text-slate-400">{userLabel}</span>
