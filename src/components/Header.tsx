@@ -40,7 +40,7 @@ export default async function Header() {
   ).sort();
 
   return (
-    <header className="border-b bg-white relative">
+    <header className="border-b bg-white relative z-40">
       <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/events" className="font-bold text-emerald-700">

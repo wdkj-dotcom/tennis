@@ -37,8 +37,8 @@ export default function MobileNav({
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 top-full bg-white border-b shadow-sm">
-          <nav className="flex flex-col px-4 py-2 text-sm">
+        <div className="absolute left-0 right-0 top-full z-50 bg-white border-b shadow-lg">
+          <nav className="flex flex-col px-4 py-2 text-sm bg-white">
             <Link
               href="/events"
               className="py-3 border-b text-slate-600"
