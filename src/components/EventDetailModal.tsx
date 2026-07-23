@@ -20,12 +20,13 @@ export default function EventDetailModal({ children }: { children: ReactNode }) 
   return (
     <div
       className="fixed inset-0 z-50 bg-black/40 overflow-y-auto"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) close();
-      }}
+      onClick={close}
     >
       <div className="min-h-full flex items-center justify-center py-8 px-3">
-        <div className="relative w-full max-w-lg bg-slate-50 rounded-2xl shadow-2xl">
+        <div
+          className="relative w-full max-w-lg bg-slate-50 rounded-2xl shadow-2xl"
+          onClick={(e) => e.stopPropagation()}
+        >
           <button
             onClick={close}
             aria-label="閉じる"

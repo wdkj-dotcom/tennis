@@ -6,6 +6,7 @@ import SubmitButton from "@/components/SubmitButton";
 import MonthFilter from "@/components/MonthFilter";
 import IncludeCancelledToggle from "@/components/IncludeCancelledToggle";
 import MobileNav from "./MobileNav";
+import RefreshButton from "./RefreshButton";
 
 export default async function Header() {
   const profile = await getCurrentProfile();
@@ -48,6 +49,7 @@ export default async function Header() {
           </NavLink>
           {months.length > 0 && <MonthFilter months={months} />}
           <IncludeCancelledToggle />
+          <RefreshButton />
         </div>
 
         <nav className="hidden sm:flex items-center gap-4 text-sm">

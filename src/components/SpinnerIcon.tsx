@@ -1,9 +1,15 @@
-export default function SpinnerIcon({ className = "" }: { className?: string }) {
+export default function SpinnerIcon({
+  className = "",
+  size = 14,
+}: {
+  className?: string;
+  size?: number;
+}) {
   return (
     <svg
       className={`animate-spin ${className}`}
-      width="14"
-      height="14"
+      width={size}
+      height={size}
       viewBox="0 0 24 24"
       fill="none"
     >

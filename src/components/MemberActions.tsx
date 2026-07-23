@@ -1,7 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
+import { useEffect, useTransition } from "react";
 import SpinnerIcon from "./SpinnerIcon";
+import { useLoadingOverlay } from "./LoadingOverlay";
 import type { Role } from "@/types/database";
 
 type ActionResult = { error?: string };
@@ -24,6 +25,13 @@ export default function MemberActions({
   deleteMember: (id: string) => Promise<ActionResult>;
 }) {
   const [isPending, startTransition] = useTransition();
+  const { show, hide } = useLoadingOverlay();
+
+  useEffect(() => {
+    if (!isPending) return;
+    show();
+    return () => hide();
+  }, [isPending, show, hide]);
 
   function handleRename() {
     const name = window.prompt("新しい名前を入力してください", currentName);

@@ -6,8 +6,7 @@ import { getAllEvents, getVisibilityRows } from "@/lib/events-data";
 import { formatEventTitle } from "@/lib/eventFormat";
 import SubmitButton from "@/components/SubmitButton";
 import EventStatusBadge from "@/components/EventStatusBadge";
-import EventsCalendar from "@/components/EventsCalendar";
-import CalendarMonthNav from "@/components/CalendarMonthNav";
+import CalendarView from "@/components/CalendarView";
 import type { Event, Rsvp } from "@/types/database";
 
 function getRowClass(eventStatus: Event["status"], myStatus: string | undefined) {
@@ -123,15 +122,7 @@ export default async function EventsPage({
       </div>
 
       {isCalendarView ? (
-        <>
-          <CalendarMonthNav displayMonth={displayMonth} />
-          <EventsCalendar
-            displayMonth={displayMonth}
-            events={events}
-            today={today}
-            includeCancelled={includeCancelled}
-          />
-        </>
+        <CalendarView displayMonth={displayMonth} events={events} today={today} />
       ) : !events || events.length === 0 ? (
         <p className="text-slate-500 text-sm">
           {month ? "この月の日程はありません。" : "今後の日程はありません。"}

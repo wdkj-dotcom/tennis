@@ -17,7 +17,6 @@ export default function EventsCalendar({
   displayMonth: string; // "YYYY-MM"
   events: Event[];
   today: string; // "YYYY-MM-DD"
-  includeCancelled?: string;
 }) {
   const [year, month] = displayMonth.split("-").map(Number);
   const firstOfMonth = new Date(year, month - 1, 1);
