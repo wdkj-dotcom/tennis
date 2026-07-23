@@ -12,9 +12,11 @@ import { setEventStatus } from "@/app/admin/events/actions";
 export default async function EventDetailContent({
   id,
   isModal = false,
+  bare = false,
 }: {
   id: string;
   isModal?: boolean;
+  bare?: boolean;
 }) {
   const myProfile = await getCurrentProfile();
   if (!myProfile) redirect("/login");
@@ -71,17 +73,10 @@ export default async function EventDetailContent({
     .join("\n");
   const lineShareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`;
 
-  return (
-    <div className={`max-w-3xl mx-auto px-4 ${isModal ? "py-4" : "py-8"}`}>
-      {!isModal && (
-        <Link href="/events" className="text-sm text-emerald-600 hover:underline">
-          ← 日程一覧に戻る
-        </Link>
-      )}
-
+  const card = (
       <div
         className={`bg-white rounded-xl shadow-sm border border-slate-200 p-5 ${
-          isModal ? "" : "mt-4"
+          isModal || bare ? "" : "mt-4"
         }`}
       >
         <div className="flex items-start justify-between gap-2 flex-wrap">
@@ -260,6 +255,18 @@ export default async function EventDetailContent({
           </div>
         </div>
       </div>
+  );
+
+  if (bare) return card;
+
+  return (
+    <div className={`max-w-3xl mx-auto px-4 ${isModal ? "py-4" : "py-8"}`}>
+      {!isModal && (
+        <Link href="/events" className="text-sm text-emerald-600 hover:underline">
+          ← 日程一覧に戻る
+        </Link>
+      )}
+      {card}
     </div>
   );
 }

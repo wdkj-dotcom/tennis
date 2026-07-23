@@ -6,6 +6,9 @@ import { getAllEvents, getVisibilityRows } from "@/lib/events-data";
 import { formatEventTitle } from "@/lib/eventFormat";
 import SubmitButton from "@/components/SubmitButton";
 import EventStatusBadge from "@/components/EventStatusBadge";
+import EventsCalendar from "@/components/EventsCalendar";
+import CalendarMonthNav from "@/components/CalendarMonthNav";
+import EventDetailContent from "./[id]/EventDetailContent";
 import type { Event, Rsvp } from "@/types/database";
 
 function getRowClass(eventStatus: Event["status"], myStatus: string | undefined) {
@@ -22,12 +25,18 @@ import { setRsvp } from "./[id]/actions";
 export default async function EventsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ month?: string; includeCancelled?: string }>;
+  searchParams: Promise<{
+    month?: string;
+    includeCancelled?: string;
+    view?: string;
+    eventId?: string;
+  }>;
 }) {
   const profile = await getCurrentProfile();
   if (!profile) redirect("/login");
 
-  const { month, includeCancelled } = await searchParams;
+  const { month, includeCancelled, view, eventId } = await searchParams;
+  const isCalendarView = view === "calendar";
 
   const supabase = createAdminClient();
 
@@ -59,8 +68,11 @@ export default async function EventsPage({
     .filter((ev) => includeCancelled === "1" || ev.status !== "cancelled");
 
   const today = new Date().toISOString().slice(0, 10);
+  const displayMonth = month ?? today.slice(0, 7);
 
-  const events = month
+  const events = isCalendarView
+    ? allEvents.filter((ev) => ev.event_date.startsWith(displayMonth))
+    : month
     ? allEvents.filter((ev) => ev.event_date.startsWith(month))
     : allEvents.filter((ev) => ev.event_date >= today);
 
@@ -77,9 +89,58 @@ export default async function EventsPage({
     (rsvps ?? []).find((r) => r.event_id === eventId && r.user_id === profile?.id)
       ?.status;
 
+  const listParams = new URLSearchParams();
+  if (month) listParams.set("month", month);
+  if (includeCancelled === "1") listParams.set("includeCancelled", "1");
+  const listHref = `/events${listParams.toString() ? `?${listParams}` : ""}`;
+
+  const calendarParams = new URLSearchParams(listParams);
+  calendarParams.set("month", displayMonth);
+  calendarParams.set("view", "calendar");
+  const calendarHref = `/events?${calendarParams}`;
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-4">
-      {!events || events.length === 0 ? (
+      <div className="flex gap-1 mb-3">
+        <Link
+          href={listHref}
+          className={`px-3 py-1 rounded text-sm font-medium ${
+            !isCalendarView
+              ? "bg-emerald-600 text-white"
+              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+          }`}
+        >
+          リスト
+        </Link>
+        <Link
+          href={calendarHref}
+          className={`px-3 py-1 rounded text-sm font-medium ${
+            isCalendarView
+              ? "bg-emerald-600 text-white"
+              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+          }`}
+        >
+          カレンダー
+        </Link>
+      </div>
+
+      {isCalendarView ? (
+        <>
+          <CalendarMonthNav displayMonth={displayMonth} />
+          <EventsCalendar
+            displayMonth={displayMonth}
+            events={events}
+            today={today}
+            selectedEventId={eventId}
+            includeCancelled={includeCancelled}
+          />
+          {eventId && (
+            <div className="mt-3">
+              <EventDetailContent id={eventId} bare />
+            </div>
+          )}
+        </>
+      ) : !events || events.length === 0 ? (
         <p className="text-slate-500 text-sm">
           {month ? "この月の日程はありません。" : "今後の日程はありません。"}
         </p>
