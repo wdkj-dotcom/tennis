@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
+import HeaderSkeleton from "@/components/HeaderSkeleton";
 import { LoadingOverlayProvider } from "@/components/LoadingOverlay";
 
 const geistSans = Geist({
@@ -35,7 +37,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-slate-50">
         <LoadingOverlayProvider>
-          <Header />
+          <Suspense fallback={<HeaderSkeleton />}>
+            <Header />
+          </Suspense>
           <main className="flex-1">{children}</main>
         </LoadingOverlayProvider>
       </body>
