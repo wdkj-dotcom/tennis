@@ -86,8 +86,11 @@ export default async function EventsPage({
     (rsvps ?? []).find((r) => r.event_id === eventId && r.user_id === profile?.id)
       ?.status;
 
+  // Don't carry the calendar's currently-browsed month into the list tab —
+  // that month is calendar navigation state, not a list filter the user
+  // chose, so switching back to リスト should show 今後の予定 again.
   const listParams = new URLSearchParams();
-  if (month) listParams.set("month", month);
+  if (!isCalendarView && month) listParams.set("month", month);
   if (includeCancelled === "1") listParams.set("includeCancelled", "1");
   const listHref = `/events${listParams.toString() ? `?${listParams}` : ""}`;
 
