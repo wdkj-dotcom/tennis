@@ -67,11 +67,7 @@ export default async function EventsPage({
   const today = new Date().toISOString().slice(0, 10);
   const displayMonth = month ?? today.slice(0, 7);
 
-  const events = isCalendarView
-    ? allEvents.filter((ev) => ev.event_date.startsWith(displayMonth))
-    : month
-    ? allEvents.filter((ev) => ev.event_date.startsWith(month))
-    : allEvents.filter((ev) => ev.event_date >= today);
+  const events = allEvents.filter((ev) => ev.event_date.startsWith(displayMonth));
 
   const attendingFor = (eventId: string) =>
     (rsvps ?? []).filter((r) => r.event_id === eventId && r.status === "attending");
@@ -86,16 +82,12 @@ export default async function EventsPage({
     (rsvps ?? []).find((r) => r.event_id === eventId && r.user_id === profile?.id)
       ?.status;
 
-  // Don't carry the calendar's currently-browsed month into the list tab —
-  // that month is calendar navigation state, not a list filter the user
-  // chose, so switching back to リスト should show 今後の予定 again.
   const listParams = new URLSearchParams();
-  if (!isCalendarView && month) listParams.set("month", month);
+  listParams.set("month", displayMonth);
   if (includeCancelled === "1") listParams.set("includeCancelled", "1");
-  const listHref = `/events${listParams.toString() ? `?${listParams}` : ""}`;
+  const listHref = `/events?${listParams}`;
 
   const calendarParams = new URLSearchParams(listParams);
-  calendarParams.set("month", displayMonth);
   calendarParams.set("view", "calendar");
   const calendarHref = `/events?${calendarParams}`;
 
@@ -127,9 +119,7 @@ export default async function EventsPage({
       {isCalendarView ? (
         <CalendarView displayMonth={displayMonth} events={events} today={today} />
       ) : !events || events.length === 0 ? (
-        <p className="text-slate-500 text-sm">
-          {month ? "この月の日程はありません。" : "今後の日程はありません。"}
-        </p>
+        <p className="text-slate-500 text-sm">この月の日程はありません。</p>
       ) : (
         <ul className="divide-y bg-white">
           {events.map((ev) => {

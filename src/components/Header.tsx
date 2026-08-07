@@ -36,9 +36,15 @@ export default async function Header() {
     });
   }
 
-  const months = Array.from(
-    new Set(visibleEvents.map((ev) => ev.event_date.slice(0, 7)))
-  ).sort();
+  const now = new Date();
+  const currentMonth = now.toISOString().slice(0, 7);
+  const nextMonthDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const nextMonth = `${nextMonthDate.getFullYear()}-${String(
+    nextMonthDate.getMonth() + 1
+  ).padStart(2, "0")}`;
+
+  const eventMonths = new Set(visibleEvents.map((ev) => ev.event_date.slice(0, 7)));
+  const months = [currentMonth, nextMonth].filter((m) => eventMonths.has(m));
 
   return (
     <header className="border-b bg-white relative z-40">
@@ -47,7 +53,9 @@ export default async function Header() {
           <NavLink href="/events" className="font-bold text-emerald-700">
             開催日程
           </NavLink>
-          {months.length > 0 && <MonthFilter months={months} />}
+          {months.length > 0 && (
+            <MonthFilter months={months} currentMonth={currentMonth} />
+          )}
           <IncludeCancelledToggle />
           <RefreshButton />
         </div>
