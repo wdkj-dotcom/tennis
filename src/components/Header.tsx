@@ -49,8 +49,11 @@ export default async function Header() {
   return (
     <header className="border-b bg-white relative z-40">
       <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <NavLink href="/events" className="font-bold text-emerald-700">
+        <div className="flex items-center gap-3 min-w-0">
+          <NavLink
+            href="/events"
+            className="font-bold text-emerald-700 shrink-0 whitespace-nowrap"
+          >
             開催日程
           </NavLink>
           {months.length > 0 && (

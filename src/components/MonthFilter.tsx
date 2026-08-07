@@ -29,10 +29,10 @@ export default function MonthFilter({
   return (
     <div className="flex items-center gap-1 overflow-x-auto max-w-[50vw] sm:max-w-none">
       {months.map((m) => {
-        const [y, mo] = m.split("-");
+        const mo = m.split("-")[1];
         return (
           <NavLink key={m} href={hrefFor(m)} className={tabClass(active === m)}>
-            {y}年{Number(mo)}月
+            {Number(mo)}月
           </NavLink>
         );
       })}
