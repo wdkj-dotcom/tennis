@@ -138,7 +138,6 @@ export default function EventForm({
         />
       </div>
       <SubmitButton
-        pendingText="保存しています…"
         className="bg-emerald-600 text-white rounded px-4 py-2 text-sm font-medium hover:bg-emerald-700"
       >
         {submitLabel}

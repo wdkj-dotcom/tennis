@@ -91,7 +91,7 @@ export default async function Header() {
           )}
           <span className="text-slate-400">{userLabel}</span>
           <form action={signOut}>
-            <SubmitButton pendingText="ログアウト中…" className="text-slate-500 hover:text-red-600">
+            <SubmitButton className="text-slate-500 hover:text-red-600">
               ログアウト
             </SubmitButton>
           </form>

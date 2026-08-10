@@ -105,7 +105,6 @@ export default async function EventDetailContent({
               </NavLink>
               <form action={removeEvent}>
                 <SubmitButton
-                  pendingText="削除中…"
                   className="text-red-500 hover:text-red-700"
                 >
                   削除
@@ -138,7 +137,6 @@ export default async function EventDetailContent({
           <div className="mt-3 flex flex-wrap gap-1.5">
             <form action={markTentative}>
               <SubmitButton
-                pendingText="…"
                 className={`px-2.5 py-1 rounded text-xs font-medium ${
                   event.status === "tentative"
                     ? "bg-slate-600 text-white"
@@ -150,7 +148,6 @@ export default async function EventDetailContent({
             </form>
             <form action={markConfirmed}>
               <SubmitButton
-                pendingText="…"
                 className={`px-2.5 py-1 rounded text-xs font-medium ${
                   event.status === "confirmed"
                     ? "bg-emerald-600 text-white"
@@ -162,7 +159,6 @@ export default async function EventDetailContent({
             </form>
             <form action={markCancelled}>
               <SubmitButton
-                pendingText="…"
                 className={`px-2.5 py-1 rounded text-xs font-medium ${
                   event.status === "cancelled"
                     ? "bg-red-600 text-white"
@@ -178,7 +174,6 @@ export default async function EventDetailContent({
         <div className="mt-3 flex gap-2">
           <form action={setRsvpAttending}>
             <SubmitButton
-              pendingText="送信中…"
               className={`px-4 py-1.5 rounded-full text-sm font-medium ${
                 myStatus === "attending"
                   ? "bg-emerald-600 text-white"
@@ -190,7 +185,6 @@ export default async function EventDetailContent({
           </form>
           <form action={setRsvpPending}>
             <SubmitButton
-              pendingText="送信中…"
               className={`px-4 py-1.5 rounded-full text-sm font-medium ${
                 myStatus === "pending"
                   ? "bg-amber-500 text-white"
@@ -202,7 +196,6 @@ export default async function EventDetailContent({
           </form>
           <form action={setRsvpNotAttending}>
             <SubmitButton
-              pendingText="送信中…"
               className={`px-4 py-1.5 rounded-full text-sm font-medium ${
                 myStatus === "not_attending"
                   ? "bg-slate-600 text-white"

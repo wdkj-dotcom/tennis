@@ -3,17 +3,13 @@
 import { useFormStatus } from "react-dom";
 import { useEffect } from "react";
 import type { ButtonHTMLAttributes } from "react";
-import SpinnerIcon from "./SpinnerIcon";
 import { useLoadingOverlay } from "./LoadingOverlay";
 
 export default function SubmitButton({
   children,
-  pendingText,
   className,
   ...rest
-}: ButtonHTMLAttributes<HTMLButtonElement> & {
-  pendingText?: string;
-}) {
+}: ButtonHTMLAttributes<HTMLButtonElement>) {
   const { pending } = useFormStatus();
   const { show, hide } = useLoadingOverlay();
 
@@ -30,8 +26,7 @@ export default function SubmitButton({
       className={`${className ?? ""} disabled:opacity-60 disabled:cursor-wait inline-flex items-center justify-center gap-1.5`}
       {...rest}
     >
-      {pending && <SpinnerIcon />}
-      {pending ? pendingText ?? "処理中…" : children}
+      {children}
     </button>
   );
 }

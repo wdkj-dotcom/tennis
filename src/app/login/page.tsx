@@ -39,7 +39,6 @@ export default async function LoginPage({
             />
           </div>
           <SubmitButton
-            pendingText="入っています…"
             className="w-full bg-emerald-600 text-white rounded py-2 text-sm font-medium hover:bg-emerald-700"
           >
             入る

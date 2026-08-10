@@ -74,7 +74,6 @@ export default function MobileNav({
             <span className="py-3 border-b text-slate-400">{userLabel}</span>
             <form action={signOutAction}>
               <SubmitButton
-                pendingText="ログアウト中…"
                 className="py-3 text-red-600 w-full text-left"
               >
                 ログアウト

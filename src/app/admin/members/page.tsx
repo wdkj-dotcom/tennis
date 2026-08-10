@@ -58,7 +58,6 @@ export default async function MembersPage({
             </select>
           </div>
           <SubmitButton
-            pendingText="追加しています…"
             className="bg-emerald-600 text-white rounded px-4 py-2 text-sm font-medium hover:bg-emerald-700"
           >
             追加する

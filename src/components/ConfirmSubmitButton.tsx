@@ -3,17 +3,14 @@
 import { useFormStatus } from "react-dom";
 import { useEffect } from "react";
 import type { ButtonHTMLAttributes } from "react";
-import SpinnerIcon from "./SpinnerIcon";
 import { useLoadingOverlay } from "./LoadingOverlay";
 
 export default function ConfirmSubmitButton({
   children,
-  pendingText,
   confirmText,
   className,
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
-  pendingText?: string;
   confirmText: string;
 }) {
   const { pending } = useFormStatus();
@@ -35,8 +32,7 @@ export default function ConfirmSubmitButton({
       }}
       {...rest}
     >
-      {pending && <SpinnerIcon />}
-      {pending ? pendingText ?? "処理中…" : children}
+      {children}
     </button>
   );
 }

@@ -53,7 +53,6 @@ export default async function BulkDeleteEventsPage({
 
           <ConfirmSubmitButton
             confirmText="選択した日程を削除しますか？この操作は取り消せません。"
-            pendingText="削除中…"
             className="bg-red-600 text-white rounded px-4 py-2 text-sm font-medium hover:bg-red-700"
           >
             選択した日程を削除する

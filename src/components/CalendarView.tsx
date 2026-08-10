@@ -4,14 +4,8 @@ import { useEffect, useRef, useTransition, type TouchEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Event } from "@/types/database";
 import EventsCalendar from "./EventsCalendar";
-import SpinnerIcon from "./SpinnerIcon";
 import { useLoadingOverlay } from "./LoadingOverlay";
-
-function shiftMonth(month: string, delta: number) {
-  const [y, m] = month.split("-").map(Number);
-  const d = new Date(y, m - 1 + delta, 1);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-}
+import { shiftMonth } from "@/lib/month";
 
 const SWIPE_THRESHOLD = 50;
 
@@ -74,7 +68,6 @@ export default function CalendarView({
         </button>
         <span className="text-sm font-medium inline-flex items-center gap-1.5">
           {y}年{m}月
-          {isPending && <SpinnerIcon />}
         </span>
         <button
           onClick={() => goTo(shiftMonth(displayMonth, 1))}

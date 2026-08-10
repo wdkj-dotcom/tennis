@@ -7,6 +7,7 @@ import { formatEventTitle } from "@/lib/eventFormat";
 import SubmitButton from "@/components/SubmitButton";
 import EventStatusBadge from "@/components/EventStatusBadge";
 import CalendarView from "@/components/CalendarView";
+import SwipeMonthNav from "@/components/SwipeMonthNav";
 import type { Event, Rsvp } from "@/types/database";
 
 function getRowClass(eventStatus: Event["status"], myStatus: string | undefined) {
@@ -118,10 +119,12 @@ export default async function EventsPage({
 
       {isCalendarView ? (
         <CalendarView displayMonth={displayMonth} events={events} today={today} />
-      ) : !events || events.length === 0 ? (
-        <p className="text-slate-500 text-sm">この月の日程はありません。</p>
       ) : (
-        <ul className="divide-y bg-white">
+        <SwipeMonthNav displayMonth={displayMonth}>
+          {!events || events.length === 0 ? (
+            <p className="text-slate-500 text-sm">この月の日程はありません。</p>
+          ) : (
+            <ul className="divide-y bg-white">
           {events.map((ev) => {
             const attending = attendingFor(ev.id);
             const pending = pendingFor(ev.id);
@@ -173,7 +176,6 @@ export default async function EventsPage({
                   <div className="flex gap-1 shrink-0">
                     <form action={setAttending}>
                       <SubmitButton
-                        pendingText="…"
                         className={`px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap ${
                           status === "attending"
                             ? "bg-emerald-600 text-white"
@@ -185,7 +187,6 @@ export default async function EventsPage({
                     </form>
                     <form action={setPending}>
                       <SubmitButton
-                        pendingText="…"
                         className={`px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap ${
                           status === "pending"
                             ? "bg-amber-500 text-white"
@@ -197,7 +198,6 @@ export default async function EventsPage({
                     </form>
                     <form action={setNotAttending}>
                       <SubmitButton
-                        pendingText="…"
                         className={`px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap ${
                           status === "not_attending"
                             ? "bg-slate-600 text-white"
@@ -212,7 +212,9 @@ export default async function EventsPage({
               </li>
             );
           })}
-        </ul>
+            </ul>
+          )}
+        </SwipeMonthNav>
       )}
     </div>
   );
