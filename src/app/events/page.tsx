@@ -68,7 +68,10 @@ export default async function EventsPage({
   const today = new Date().toISOString().slice(0, 10);
   const displayMonth = month ?? today.slice(0, 7);
 
-  const events = allEvents.filter((ev) => ev.event_date.startsWith(displayMonth));
+  const monthEvents = allEvents.filter((ev) => ev.event_date.startsWith(displayMonth));
+  const events = isCalendarView
+    ? monthEvents
+    : monthEvents.filter((ev) => ev.event_date >= today);
 
   const attendingFor = (eventId: string) =>
     (rsvps ?? []).filter((r) => r.event_id === eventId && r.status === "attending");
@@ -130,7 +133,6 @@ export default async function EventsPage({
             const pending = pendingFor(ev.id);
             const notAttending = notAttendingFor(ev.id);
             const status = myStatusFor(ev.id);
-            const isPast = ev.event_date < today;
             const names = [
               ...attending.map((r) => r.profiles?.name ?? "不明"),
               ...pending.map((r) => `(${r.profiles?.name ?? "不明"})`),
@@ -148,9 +150,7 @@ export default async function EventsPage({
             return (
               <li
                 key={ev.id}
-                className={`py-1.5 px-2 -mx-2 rounded ${statusClass} ${
-                  isPast ? "opacity-50" : ""
-                }`}
+                className={`py-1.5 px-2 -mx-2 rounded ${statusClass}`}
               >
                 <NavLink href={`/events/${ev.id}`} className="block hover:opacity-80">
                   <div className="flex items-baseline gap-2 min-w-0">
